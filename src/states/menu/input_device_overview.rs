@@ -3,17 +3,19 @@ use cpal::traits::{HostTrait, DeviceTrait};
 
 use crate::{components::button_primary::spawn_button, plugins::input_devices::SelectInputDeviceButton, resources::input_devices::InputDevices};
 
-const MARGIN: Val = Val::Px(12.);
-
 #[derive(Component)]
 pub struct InputDeviceOverviewMarker;
 
-pub fn state_input_device_overview(mut commands: Commands, asset_server: Res<AssetServer>, mut input_devices: ResMut<InputDevices>) {
+pub fn state_input_device_overview(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut input_devices: ResMut<InputDevices>
+) {
     let devices = input_devices.host.input_devices().unwrap();
     let device_list = devices.collect();
     input_devices.input_devices = device_list;
 
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default(), InputDeviceOverviewMarker));
     commands
         .spawn((
             NodeBundle {
@@ -23,8 +25,8 @@ pub fn state_input_device_overview(mut commands: Commands, asset_server: Res<Ass
                     height: Val::Percent(100.),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Center,
-                    padding: UiRect::all(MARGIN),
-                    row_gap: MARGIN,
+                    padding: UiRect::all(Val::Px(12.)),
+                    row_gap: Val::Px(12.),
                     ..Default::default()
                 },
                 background_color: BackgroundColor(Color::BLACK),

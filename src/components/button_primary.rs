@@ -27,7 +27,7 @@ pub fn spawn_button<T: 'static + Send + Sync>(
                 align_items: AlignItems::Center,
                 ..Default::default()
             },
-            background_color: BackgroundColor(color.into()),
+            background_color: BackgroundColor(color),
             ..Default::default()
         },
         ButtonPrimary { data },
@@ -51,10 +51,10 @@ pub fn handle_generic_interaction(
 ) {
     match *interaction {
         Interaction::Hovered => {
-            *color = BackgroundColor(Color::srgb(0.35, 0.35, 0.35).into());
+            *color = BackgroundColor(Color::srgb(0.35, 0.35, 0.35));
         }
         Interaction::None => {
-            *color = BackgroundColor(Color::srgb(0.15, 0.15, 0.15).into());
+            *color = BackgroundColor(Color::srgb(0.15, 0.15, 0.15));
         }
         _ => {}  // Ignore other interactions
     }
