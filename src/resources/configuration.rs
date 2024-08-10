@@ -3,13 +3,13 @@ use cpal::Device;
 
 #[derive(PartialEq, Clone)]
 pub enum DeviceChannel {
-    L,
-    R,
-    Both
+    One,
+    Two,
+    All
 }
 
 #[derive(Default, Resource)]
 pub struct Configuration {
     pub device: Option<Device>,
-    pub channel: Option<DeviceChannel>
+    pub selected_device_channel: Option<DeviceChannel>
 }

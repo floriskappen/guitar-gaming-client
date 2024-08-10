@@ -32,11 +32,11 @@ impl AudioStream {
             move |data: &[f32], _: &cpal::InputCallbackInfo| {
                 let mut buffer = buffer_clone.lock().unwrap();
 
-                if channel_clone == DeviceChannel::L {
+                if channel_clone == DeviceChannel::One {
                     for frame in data.chunks(channels as usize) {
                         buffer.push(frame[0]); // Left channel
                     }
-                } else if channel_clone == DeviceChannel::R {
+                } else if channel_clone == DeviceChannel::Two {
                     for frame in data.chunks(channels as usize) {
                         buffer.push(frame[1]); // Right channel
                     }

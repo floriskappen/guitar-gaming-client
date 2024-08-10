@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use cpal::traits::DeviceTrait;
 
-use crate::{components::input_device_detail::audio_bar::spawn_audio_bar, resources::configuration::{Configuration, DeviceChannel}};
+use crate::{resources::configuration::{Configuration, DeviceChannel}, screens::input_device_detail::audio_bar::spawn_audio_bar};
 
 #[derive(Component)]
 pub struct InputDeviceDetailMarker;
@@ -18,6 +18,7 @@ pub fn state_input_device_detail(
         .map(|config| config.with_max_sample_rate())
         .find(|config| config.channels() >= 1)
         .expect("No suitable configuration found");
+    let channels = config.channels();
 
     commands.spawn((Camera2dBundle::default(), InputDeviceDetailMarker));
     commands
@@ -29,18 +30,23 @@ pub fn state_input_device_detail(
                     height: Val::Percent(100.),
                     flex_direction: FlexDirection::Row,
                     align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
                     padding: UiRect::all(Val::Px(12.)),
                     row_gap: Val::Px(12.),
                     ..Default::default()
                 },
-                background_color: BackgroundColor(Color::BLACK),
+                background_color: BackgroundColor(Color::srgb(0.10, 0.10, 0.10)),
                 ..Default::default()
             },
             InputDeviceDetailMarker
         ))
         .with_children(|builder| {
-            spawn_audio_bar(builder, &asset_server, DeviceChannel::L);
-            spawn_audio_bar(builder, &asset_server, DeviceChannel::R);
+            if channels > 1 {
+                spawn_audio_bar(builder, &asset_server, DeviceChannel::One);
+                spawn_audio_bar(builder, &asset_server, DeviceChannel::Two);
+            } else {
+                spawn_audio_bar(builder, &asset_server, DeviceChannel::One);
+            }
         });
 
     println!("{:?}", config);

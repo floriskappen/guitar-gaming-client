@@ -5,9 +5,6 @@ pub struct ButtonPrimary<T: 'static + Send + Sync> {
     pub data: T,
 }
 
-#[derive(Component)]
-pub struct ButtonPrimaryMarker;
-
 // Function to create a button entity
 pub fn spawn_button<T: 'static + Send + Sync>(
     builder: &mut ChildBuilder,
@@ -37,7 +34,7 @@ pub fn spawn_button<T: 'static + Send + Sync>(
         parent.spawn(TextBundle::from_section(
             text,
             TextStyle {
-                font: asset_server.load("fonts/InterVariable.ttf"),
+                font: asset_server.load("fonts/IBMPlexMono-Regular.ttf"),
                 font_size: 20.0,
                 color: Color::WHITE,
             },

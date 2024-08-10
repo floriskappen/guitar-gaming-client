@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 use cpal::traits::{HostTrait, DeviceTrait};
 
-use crate::{components::button_primary::spawn_button, plugins::input_devices::SelectInputDeviceButton, resources::input_devices::InputDevices};
+use crate::{components::button_primary::spawn_button, resources::input_devices::InputDevices};
+
+use super::button_select_input_device::SelectInputDeviceButton;
 
 #[derive(Component)]
 pub struct InputDeviceOverviewMarker;
@@ -29,7 +31,7 @@ pub fn state_input_device_overview(
                     row_gap: Val::Px(12.),
                     ..Default::default()
                 },
-                background_color: BackgroundColor(Color::BLACK),
+                background_color: BackgroundColor(Color::srgb(0.10, 0.10, 0.10)),
                 ..Default::default()
             },
             InputDeviceOverviewMarker

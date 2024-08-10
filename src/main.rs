@@ -1,8 +1,7 @@
 use bevy::prelude::*;
-use components::input_device_detail::audio_bar::audio_bar_system;
-use plugins::input_devices::InputDevicePlugin;
-use resources::configuration::Configuration;
-use states::{app_state::AppState, menu::{input_device_detail::{cleanup_input_device_detail, state_input_device_detail}, input_device_overview::{cleanup_input_device_overview, state_input_device_overview}}};
+use resources::{configuration::Configuration, input_device::InputDevice, input_devices::InputDevices};
+use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin};
+use states::app_state::AppState;
 
 mod resources {
     pub mod input_devices;
@@ -11,19 +10,21 @@ mod resources {
 }
 mod components {
     pub mod button_primary;
+}
+mod screens {
+    pub mod input_device_overview {
+        pub mod plugin;
+        pub mod input_device_overview;
+        pub mod button_select_input_device;
+    }
     pub mod input_device_detail {
+        pub mod plugin;
+        pub mod input_device_detail;
         pub mod audio_bar;
     }
 }
 mod states {
-    pub mod menu {
-        pub mod input_device_overview;
-        pub mod input_device_detail;
-    }
     pub mod app_state;
-}
-mod plugins {
-    pub mod input_devices;
 }
 mod helpers {
     pub mod input_device;
@@ -38,16 +39,15 @@ fn main() {
             }),
             ..Default::default()
         }))
+
         .insert_state(AppState::InputDeviceOverview)
+
         .insert_resource(Configuration::default())
+        .insert_resource(InputDevices::default())
+        .insert_resource(InputDevice::default())
 
-        .add_plugins(InputDevicePlugin)
+        .add_plugins(InputDeviceOverviewPlugin)
+        .add_plugins(InputDeviceDetailPlugin)
 
-        .add_systems(OnEnter(AppState::InputDeviceOverview), state_input_device_overview)
-        .add_systems(OnExit(AppState::InputDeviceOverview), cleanup_input_device_overview)
-
-        .add_systems(OnEnter(AppState::InputDeviceDetail), state_input_device_detail)
-        .add_systems(Update, audio_bar_system.run_if(in_state(AppState::InputDeviceDetail)))
-        .add_systems(OnExit(AppState::InputDeviceDetail), cleanup_input_device_detail)
         .run();
 }

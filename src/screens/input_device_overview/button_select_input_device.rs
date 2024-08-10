@@ -3,23 +3,13 @@ use cpal::traits::DeviceTrait;
 
 use crate::{components::button_primary::{handle_generic_interaction, ButtonPrimary}, resources::{configuration::Configuration, input_device::InputDevice, input_devices::InputDevices}, states::app_state::AppState};
 
-pub struct InputDevicePlugin;
-
-
-impl Plugin for InputDevicePlugin {
-    fn build(&self, app: &mut App) {
-        app.insert_resource(InputDevices::default());
-        app.insert_resource(InputDevice::default());
-        app.add_systems(Update, button_select_input_device_interaction_system);
-    }
-}
-
 #[derive(Component, Default)]
 pub struct SelectInputDeviceButton;
 
 pub fn button_select_input_device_interaction_system(
     mut interaction_query: Query<(&Interaction, &mut BackgroundColor, &ButtonPrimary<String>, &SelectInputDeviceButton), (Changed<Interaction>, With<Button>)>,
-    input_devices: ResMut<InputDevices>,
+    input_devices: Res<InputDevices>,
+    input_device: ResMut<InputDevice>,
     mut configuration: ResMut<Configuration>,
     mut next_state: ResMut<NextState<AppState>>
 ) {
@@ -33,7 +23,3 @@ pub fn button_select_input_device_interaction_system(
         }
     }
 }
-
-// pub fn get_input_device_stream() {
-
-// }
