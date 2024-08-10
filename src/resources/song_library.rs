@@ -7,7 +7,7 @@ use crate::helpers::{persistence::get_data_dir, song_library::scan_song_library}
 
 const FILENAME: &str = "song_library.json";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SongMetadata {
     pub uuid: String,
     pub title: String,
@@ -50,5 +50,9 @@ impl SongLibraryResource {
         }
 
         return SongLibraryResource::default();
+    }
+
+    pub fn find_by_id(&self, uuid: &String) -> Option<&SongMetadata> {
+        return self.songs.iter().find(|song_metadata| &song_metadata.uuid == uuid);
     }
 }

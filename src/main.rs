@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource};
-use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin, song_select::plugin::SongSelectPlugin, tune::plugin::TunePlugin};
+use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource};
+use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin, song_play::plugin::SongPlayPlugin, song_select::plugin::SongSelectPlugin, tune::plugin::TunePlugin};
 use states::app_state::AppState;
 
 mod resources {
@@ -8,6 +8,7 @@ mod resources {
     pub mod configuration;
     pub mod input_device;
     pub mod song_library;
+    pub mod song_loaded;
 }
 mod components {
     pub mod button_primary;
@@ -31,6 +32,10 @@ mod screens {
         pub mod plugin;
         pub mod song_select;
         pub mod song_list;
+    }
+    pub mod song_play {
+        pub mod plugin;
+        pub mod song_play;
     }
 }
 mod states {
@@ -64,11 +69,13 @@ fn main() {
     app.insert_resource(InputDevicesResource::default());
     app.insert_resource(InputDeviceResource::default());
     app.insert_resource(SongLibraryResource::load_from_disk());
+    app.insert_resource(SongLoadedResource::default());
 
     app.add_plugins(InputDeviceOverviewPlugin);
     app.add_plugins(InputDeviceDetailPlugin);
     app.add_plugins(TunePlugin);
     app.add_plugins(SongSelectPlugin);
+    app.add_plugins(SongPlayPlugin);
 
     app.run();
 }

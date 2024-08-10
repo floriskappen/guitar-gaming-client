@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{components::button_minimal::spawn_button_minimal, helpers::song_library::scan_song_library, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, song_library::SongLibraryResource}, states::app_state::AppState};
+use crate::{components::button_minimal::spawn_button_minimal, helpers::song_library::scan_song_library, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::song_list::{spawn_song_list, SongListItemMarker};
 
@@ -51,7 +51,7 @@ pub fn song_select_load(
                     "< change input device",
                     ChangeInputDeviceButton
                 );
-                // Back button
+                // Refresh song library button
                 spawn_button_minimal(
                     builder,
                     &asset_server,
@@ -103,6 +103,7 @@ pub fn song_select_update(
     song_list_element_query_interaction: Query<(&SongListItemMarker, &Interaction), With<SongListItemMarker>>,
     song_list_wrapper_query: Query<Entity, With<SongListWrapperMarker>>,
     mut song_library: ResMut<SongLibraryResource>,
+    mut song_loaded: ResMut<SongLoadedResource>,
     mut next_state: ResMut<NextState<AppState>>,
     buttons: Res<ButtonInput<MouseButton>>,
 ) {
@@ -125,8 +126,11 @@ pub fn song_select_update(
         }
     }
     for (song_list_element, interaction) in song_list_element_query_interaction.iter() {
-        if *interaction == Interaction::Pressed {
-            println!("{}", song_list_element.uuid)
+        if *interaction == Interaction::Pressed && buttons.just_pressed(MouseButton::Left) {
+            if let Some(selected_song) = song_library.find_by_id(&song_list_element.uuid) {
+                song_loaded.load_song(selected_song.clone());
+                next_state.set(AppState::SongPlay);
+            }
         }
     }
 }
