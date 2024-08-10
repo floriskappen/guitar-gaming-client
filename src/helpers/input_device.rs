@@ -2,18 +2,16 @@ use std::sync::{Arc, Mutex};
 
 use cpal::{traits::{DeviceTrait, StreamTrait}, BufferSize, Device, StreamConfig};
 
-use crate::resources::configuration::DeviceChannel;
-
 pub struct AudioStream {
     pub buffer: Arc<Mutex<Vec<f32>>>,
-    pub channel: DeviceChannel,
+    pub channel: u16,
     buffer_size: usize,
 }
 
 impl AudioStream {
     pub fn new(
         device: Device,
-        channel: DeviceChannel,
+        channel: u16,
         buffer_size: usize,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let config = device.default_input_config()?;
@@ -32,16 +30,13 @@ impl AudioStream {
             move |data: &[f32], _: &cpal::InputCallbackInfo| {
                 let mut buffer = buffer_clone.lock().unwrap();
 
-                if channel_clone == DeviceChannel::One {
-                    for frame in data.chunks(channels as usize) {
-                        buffer.push(frame[0]); // Left channel
-                    }
-                } else if channel_clone == DeviceChannel::Two {
-                    for frame in data.chunks(channels as usize) {
-                        buffer.push(frame[1]); // Right channel
-                    }
-                } else {
+                // Use u16::MAX to indicate "all channels"
+                if channel_clone == u16::MAX || channels == 1 {
                     buffer.extend(data.iter().take(data.len() / channels as usize));
+                } else {
+                    for frame in data.chunks(channels as usize) {
+                        buffer.push(frame[channel_clone as usize]);
+                    }
                 }
 
                 let buffer_clone = buffer.clone();

@@ -1,24 +1,19 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
-pub struct ButtonPrimary<T: 'static + Send + Sync> {
-    pub data: T,
-}
-
 // Function to create a button entity
-pub fn spawn_button<T: 'static + Send + Sync>(
+pub fn spawn_button(
     builder: &mut ChildBuilder,
     asset_server: &Res<AssetServer>,
     text: &str,
     color: Color,
-    data: T,
-    marker: impl Component + Default,
+    marker: impl Component,
 ) {
     builder.spawn((
         ButtonBundle {
             style: Style {
                 width: Val::Px(200.0),
                 height: Val::Px(65.0),
+                padding: UiRect { left: Val::Px(12.0), right: Val::Px(12.0), top: Val::Px(8.0), bottom: Val::Px(12.0) },
                 margin: UiRect::all(Val::Auto),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
@@ -27,7 +22,6 @@ pub fn spawn_button<T: 'static + Send + Sync>(
             background_color: BackgroundColor(color),
             ..Default::default()
         },
-        ButtonPrimary { data },
         marker, // Add the marker component to distinguish the button type
     ))
     .with_children(|parent| {

@@ -1,15 +1,18 @@
 use bevy::prelude::*;
 use cpal::Device;
 
-#[derive(PartialEq, Clone)]
-pub enum DeviceChannel {
-    One,
-    Two,
-    All
+#[derive(Resource)]
+pub struct ConfigurationResource {
+    pub device: Option<Device>,
+    pub selected_device_channels: Vec<u16>
 }
 
-#[derive(Default, Resource)]
-pub struct Configuration {
-    pub device: Option<Device>,
-    pub selected_device_channel: Option<DeviceChannel>
+impl Default for ConfigurationResource {
+    fn default() -> Self {
+
+        ConfigurationResource {
+            device: None,
+            selected_device_channels: vec![]
+        }
+    }
 }

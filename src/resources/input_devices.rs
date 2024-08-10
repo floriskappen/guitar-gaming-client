@@ -2,16 +2,16 @@ use bevy::prelude::*;
 use cpal::Device;
 
 #[derive(Resource)]
-pub struct InputDevices {
+pub struct InputDevicesResource {
     pub host: cpal::Host,
     pub input_devices: Vec<Device>,
 }
-// custom implementation for unusual values
-impl Default for InputDevices {
+
+impl Default for InputDevicesResource {
     fn default() -> Self {
         let host = cpal::default_host();
 
-        InputDevices {
+        InputDevicesResource {
             host,
             input_devices: vec![]
         }

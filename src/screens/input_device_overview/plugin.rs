@@ -1,15 +1,14 @@
 use bevy::prelude::*;
 
 use crate::states::app_state::AppState;
-use crate::screens::input_device_overview::button_select_input_device::button_select_input_device_interaction_system;
-use crate::screens::input_device_overview::input_device_overview::{cleanup_input_device_overview, state_input_device_overview};
+use crate::screens::input_device_overview::input_device_overview::{input_device_overview_cleanup, input_device_overview_update, input_device_overview_load};
 
 pub struct InputDeviceOverviewPlugin;
 
 impl Plugin for InputDeviceOverviewPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::InputDeviceOverview), state_input_device_overview);
-        app.add_systems(Update, button_select_input_device_interaction_system.run_if(in_state(AppState::InputDeviceOverview)));
-        app.add_systems(OnExit(AppState::InputDeviceOverview), cleanup_input_device_overview);
+        app.add_systems(OnEnter(AppState::InputDeviceOverview), input_device_overview_load);
+        app.add_systems(Update, input_device_overview_update.run_if(in_state(AppState::InputDeviceOverview)));
+        app.add_systems(OnExit(AppState::InputDeviceOverview), input_device_overview_cleanup);
     }
 }

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use resources::{configuration::Configuration, input_device::InputDevice, input_devices::InputDevices};
+use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource};
 use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin};
 use states::app_state::AppState;
 
@@ -10,12 +10,12 @@ mod resources {
 }
 mod components {
     pub mod button_primary;
+    pub mod button_minimal;
 }
 mod screens {
     pub mod input_device_overview {
         pub mod plugin;
         pub mod input_device_overview;
-        pub mod button_select_input_device;
     }
     pub mod input_device_detail {
         pub mod plugin;
@@ -42,9 +42,9 @@ fn main() {
 
         .insert_state(AppState::InputDeviceOverview)
 
-        .insert_resource(Configuration::default())
-        .insert_resource(InputDevices::default())
-        .insert_resource(InputDevice::default())
+        .insert_resource(ConfigurationResource::default())
+        .insert_resource(InputDevicesResource::default())
+        .insert_resource(InputDeviceResource::default())
 
         .add_plugins(InputDeviceOverviewPlugin)
         .add_plugins(InputDeviceDetailPlugin)
