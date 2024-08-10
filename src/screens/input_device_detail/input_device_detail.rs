@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use cpal::traits::DeviceTrait;
 
 use crate::{components::button_minimal::spawn_button_minimal, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource}, screens::input_device_detail::audio_bar::spawn_audio_bar, states::app_state::AppState};
 
@@ -14,15 +15,20 @@ pub fn input_device_detail_load(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut input_device: ResMut<InputDeviceResource>,
-    mut configuration: ResMut<ConfigurationResource>,
+    configuration: ResMut<ConfigurationResource>,
 ) {
     // Get amount of channels in selected device
-    let device_configuration = input_device.configuration.clone().unwrap();
-    let channels = device_configuration.channels();
+    let device = configuration.device.clone().unwrap();
+    let supported_configs = device.supported_input_configs().unwrap();
+    let config = supported_configs
+        .map(|config| config.with_max_sample_rate())
+        .find(|config| config.channels() >= 1)
+        .expect("No suitable configuration found");
+    let channels = config.channels();
 
     // Create an audio stream for each channel
     let mut audio_stream_channels = vec![];
-    for _ in 0..device_configuration.channels() {
+    for _ in 0..config.channels() {
         audio_stream_channels.push(None);
     }
     input_device.audio_stream_channels = Some(audio_stream_channels);
@@ -141,6 +147,9 @@ pub fn input_device_detail_update(
 
     for interaction in continue_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed && can_continue {
+            // Save configuration to disk
+            configuration.save_to_disk();
+
             next_state.set(AppState::Tune);
         }
     }

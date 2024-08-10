@@ -33,27 +33,34 @@ mod states {
 mod helpers {
     pub mod input_device;
     pub mod tuning;
+    pub mod persistence;
 }
 
 fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Guitar Gaming".to_string(),
-                ..Default::default()
-            }),
+    let mut app = App::new();
+    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+        primary_window: Some(Window {
+            title: "Guitar Gaming".to_string(),
             ..Default::default()
-        }))
+        }),
+        ..Default::default()
+    }));
 
-        .insert_state(AppState::InputDeviceOverview)
+    let configuration_resource = ConfigurationResource::load_from_disk();
+    if configuration_resource.device.is_some() && !configuration_resource.selected_device_channels.is_empty() {
+        app.insert_state(AppState::Tune);
+    } else {
+        app.insert_state(AppState::InputDeviceOverview);
+    }
 
-        .insert_resource(ConfigurationResource::default())
-        .insert_resource(InputDevicesResource::default())
-        .insert_resource(InputDeviceResource::default())
+    app.insert_resource(configuration_resource);
 
-        .add_plugins(InputDeviceOverviewPlugin)
-        .add_plugins(InputDeviceDetailPlugin)
-        .add_plugins(TunePlugin)
+    app.insert_resource(InputDevicesResource::default());
+    app.insert_resource(InputDeviceResource::default());
 
-        .run();
+    app.add_plugins(InputDeviceOverviewPlugin);
+    app.add_plugins(InputDeviceDetailPlugin);
+    app.add_plugins(TunePlugin);
+
+    app.run();
 }

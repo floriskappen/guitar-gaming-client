@@ -123,7 +123,6 @@ pub fn input_device_overview_update(
             for channel in 0..channels {
                 initial_selected_chanels.push(channel);
             }
-            input_device.configuration = Some(config.clone());
             configuration.selected_device_channels = initial_selected_chanels;
 
             next_state.set(AppState::InputDeviceDetail);

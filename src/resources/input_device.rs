@@ -8,5 +8,4 @@ use crate::helpers::input_device::AudioStream;
 pub struct InputDeviceResource {
     pub audio_stream_main: Option<AudioStream>,
     pub audio_stream_channels: Option<Vec<Option<AudioStream>>>,
-    pub configuration: Option<SupportedStreamConfig>,
 }
