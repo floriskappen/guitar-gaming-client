@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource};
-use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin};
+use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin, tune::plugin::TunePlugin};
 use states::app_state::AppState;
 
 mod resources {
@@ -21,6 +21,10 @@ mod screens {
         pub mod plugin;
         pub mod input_device_detail;
         pub mod audio_bar;
+    }
+    pub mod tune {
+        pub mod tune;
+        pub mod plugin;
     }
 }
 mod states {
@@ -48,6 +52,7 @@ fn main() {
 
         .add_plugins(InputDeviceOverviewPlugin)
         .add_plugins(InputDeviceDetailPlugin)
+        .add_plugins(TunePlugin)
 
         .run();
 }

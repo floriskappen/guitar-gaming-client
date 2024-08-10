@@ -76,7 +76,7 @@ pub fn spawn_audio_bar(
                     NodeBundle {
                         style: Style {
                             width: Val::Px(40.0),
-                            height: Val::Px(200.0),
+                            height: Val::Px(0.0),
                             ..Default::default()
                         },
                         background_color: BackgroundColor(Color::WHITE),
@@ -130,18 +130,10 @@ pub fn audio_bar_system(
 ) {
     for (mut style, audio_bar) in audio_bar.iter_mut() {
         let device_configuration = input_device.configuration.clone().unwrap();
-
-        if input_device.audio_stream_channels.is_none() {
-            let mut audio_stream_channels = vec![];
-            for _ in 0..device_configuration.channels() {
-                audio_stream_channels.push(None);
-            }
-            input_device.audio_stream_channels = Some(audio_stream_channels)
-        }
-
         
         if let Some(audio_stream_channels) = &mut input_device.audio_stream_channels {
             let audio_bar_channel_usize = audio_bar.channel as usize;
+
             if audio_stream_channels[audio_bar_channel_usize].is_none() {
                 audio_stream_channels[audio_bar_channel_usize] = Some(AudioStream::new(configuration.device.clone().unwrap(), audio_bar.channel, 1024).unwrap())
             }

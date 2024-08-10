@@ -13,11 +13,28 @@ pub struct InputDeviceDetailMarker;
 pub fn input_device_detail_load(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    input_device: Res<InputDeviceResource>,
+    mut input_device: ResMut<InputDeviceResource>,
+    mut configuration: ResMut<ConfigurationResource>,
 ) {
-    let config = input_device.configuration.clone().unwrap();
-    let channels = config.channels();
+    // Get amount of channels in selected device
+    let device_configuration = input_device.configuration.clone().unwrap();
+    let channels = device_configuration.channels();
 
+    // Set all channels as selected by default
+    let mut initial_selected_chanels = vec![];
+    for channel in 0..channels {
+        initial_selected_chanels.push(channel);
+    }
+    configuration.selected_device_channels = initial_selected_chanels;
+
+    // Create an audio stream for each channel
+    let mut audio_stream_channels = vec![];
+    for _ in 0..device_configuration.channels() {
+        audio_stream_channels.push(None);
+    }
+    input_device.audio_stream_channels = Some(audio_stream_channels);
+
+    // Generate UI
     commands.spawn((Camera2dBundle::default(), InputDeviceDetailMarker));
     commands.spawn((NodeBundle {
         style: Style {
@@ -118,21 +135,19 @@ pub fn input_device_detail_update(
     continue_button_query: Query<&Children, With<ContinueButton>>,
     mut continue_button_query_children: Query<&mut Text>,
     mut next_state: ResMut<NextState<AppState>>,
-    mut input_device: ResMut<InputDeviceResource>,
-    mut configuration: ResMut<ConfigurationResource>,
+    configuration: Res<ConfigurationResource>,
 ) {
     for interaction in back_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
-            input_device.audio_stream_channels = None;
-            configuration.selected_device_channels.clear();
             next_state.set(AppState::InputDeviceOverview);
         }
     }
 
     let can_continue = !configuration.selected_device_channels.is_empty();
+
     for interaction in continue_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed && can_continue {
-            println!("Pressed continue button")
+            next_state.set(AppState::Tune);
         }
     }
 
@@ -152,7 +167,9 @@ pub fn input_device_detail_update(
 pub fn input_device_detail_cleanup(
     mut commands: Commands,
     query: Query<Entity, With<InputDeviceDetailMarker>>,
+    mut input_device: ResMut<InputDeviceResource>,
 ) {
+    input_device.audio_stream_channels = None;
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
     }
