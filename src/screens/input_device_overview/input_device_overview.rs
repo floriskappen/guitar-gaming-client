@@ -105,6 +105,7 @@ pub fn input_device_overview_update(
     mut configuration: ResMut<ConfigurationResource>,
     mut next_state: ResMut<NextState<AppState>>
 ) {
+    input_device.audio_stream_channels = None;
 
     // Handle select device button interaction
     for (interaction, mut color, marker) in &mut device_button_query_interaction.iter_mut() {

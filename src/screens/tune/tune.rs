@@ -166,7 +166,7 @@ pub fn tune_update(
 
     for interaction in continue_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
-            println!("Pressed continue")
+            next_state.set(AppState::SongSelect);
         }
     }
 }

@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use cpal::SupportedStreamConfig;
 
 use crate::helpers::input_device::AudioStream;
 

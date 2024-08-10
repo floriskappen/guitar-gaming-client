@@ -6,4 +6,5 @@ pub enum AppState {
     InputDeviceOverview,
     InputDeviceDetail,
     Tune,
+    SongSelect
 }

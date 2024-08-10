@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::helpers::persistence::get_data_dir;
 
+const FILENAME: &str = "configuration.json";
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigurationResourceSerializable {
     pub device_name: Option<String>,
@@ -38,13 +40,13 @@ impl ConfigurationResource {
             selected_device_channels: self.selected_device_channels.clone()
         };
         let directory = get_data_dir().unwrap();
-        let filepath = directory.join("configuration.json");
+        let filepath = directory.join(FILENAME);
         let file = File::create(filepath).expect("Failed to create file");
         serde_json::to_writer(file, &serializable_configuration).expect("Failed to write JSON to file");
     }
     pub fn load_from_disk() -> Self {
         let directory = get_data_dir().unwrap();
-        let filepath = directory.join("configuration.json");
+        let filepath = directory.join(FILENAME);
 
         if filepath.exists() {
             // Open the file and read its contents
@@ -59,11 +61,11 @@ impl ConfigurationResource {
             let host = cpal::default_host();
             let devices = host.devices().unwrap();
 
-            println!("{:?}", serializable_configuration);
-
-            if let Some(device_name) = serializable_configuration.device_name {
-                let device = devices.into_iter().find(|device| device.name().unwrap() == device_name);
+            if let Some(device_name) = &serializable_configuration.device_name {
+                let device = devices.into_iter().find(|device| &device.name().unwrap() == device_name);
                 if let Some(found_device) = device {
+
+                    println!("{:?}", serializable_configuration);
                     return ConfigurationResource {
                         device: Some(found_device),
                         selected_device_channels: serializable_configuration.selected_device_channels

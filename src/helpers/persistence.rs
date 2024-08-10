@@ -11,3 +11,14 @@ pub fn get_data_dir() -> Option<PathBuf> {
         None
     }
 }
+
+pub fn get_songs_dir() -> Option<PathBuf> {
+    if let Some(data_dir) = get_data_dir() {
+        let songs_dir = data_dir.join("songs");
+        create_dir_all(&songs_dir).ok()?;
+
+        return Some(songs_dir)
+    }
+
+    return None;
+}
