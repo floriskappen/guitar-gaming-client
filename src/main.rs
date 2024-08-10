@@ -32,6 +32,7 @@ mod states {
 }
 mod helpers {
     pub mod input_device;
+    pub mod tuning;
 }
 
 fn main() {

@@ -1,17 +1,24 @@
 use std::sync::{Arc, Mutex};
 
-use cpal::{traits::{DeviceTrait, StreamTrait}, BufferSize, Device, StreamConfig};
+use cpal::{traits::{DeviceTrait, StreamTrait}, BufferSize, Device, SampleRate, StreamConfig};
+use pitch_detection::detector::{mcleod::McLeodDetector, PitchDetector};
+use pitch_detection::detector::autocorrelation::AutocorrelationDetector;
 
+const POWER_THRESHOLD: f32 = 0.15;
+const CLARITY_THRESHOLD: f32 = 0.6;
+
+#[derive(Clone)]
 pub struct AudioStream {
     pub buffer: Arc<Mutex<Vec<f32>>>,
-    pub channel: u16,
-    buffer_size: usize,
+    pub target_channels: Vec<u16>,
+    pub buffer_size: usize,
+    pub sample_rate: SampleRate,
 }
 
 impl AudioStream {
     pub fn new(
         device: Device,
-        channel: u16,
+        target_channels: Vec<u16>,
         buffer_size: usize,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let config = device.default_input_config()?;
@@ -20,7 +27,7 @@ impl AudioStream {
         let buffer = Arc::new(Mutex::new(Vec::with_capacity(buffer_size)));
 
         let buffer_clone = Arc::clone(&buffer);
-        let channel_clone = channel.clone();
+        let target_channels_clone = target_channels.clone();
         let stream = device.build_input_stream(
             &StreamConfig {
                 buffer_size: BufferSize::Default,
@@ -30,12 +37,13 @@ impl AudioStream {
             move |data: &[f32], _: &cpal::InputCallbackInfo| {
                 let mut buffer = buffer_clone.lock().unwrap();
 
-                // Use u16::MAX to indicate "all channels"
-                if channel_clone == u16::MAX || channels == 1 {
+                if target_channels_clone.len() == channels as usize { // If all channels are selected, just take all data
                     buffer.extend(data.iter().take(data.len() / channels as usize));
                 } else {
                     for frame in data.chunks(channels as usize) {
-                        buffer.push(frame[channel_clone as usize]);
+                        for &target_channel in &target_channels_clone {
+                            buffer.push(frame[target_channel as usize]);
+                        }
                     }
                 }
 
@@ -54,8 +62,9 @@ impl AudioStream {
 
         Ok(AudioStream {
             buffer,
-            channel,
+            target_channels,
             buffer_size,
+            sample_rate
         })
     }
 
@@ -82,5 +91,21 @@ impl AudioStream {
          // Scale amplitude to a 0-100 range
 
         mean.sqrt() * 100.0
+    }
+
+    pub fn get_pitch(&self) -> Option<f32> {
+        let signal = self.buffer.lock().unwrap().clone();
+        if signal.len() < self.buffer_size {
+            return None
+        }
+
+        let padding: usize = self.buffer_size / 2;
+
+        let mut detector = AutocorrelationDetector::new(self.buffer_size, padding);
+        if let Some(pitch) = detector.get_pitch(&signal, self.sample_rate.0 as usize, POWER_THRESHOLD, CLARITY_THRESHOLD) {
+            return Some(pitch.frequency)
+        }
+
+        return None
     }
 }

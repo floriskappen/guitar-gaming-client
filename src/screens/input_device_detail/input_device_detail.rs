@@ -20,13 +20,6 @@ pub fn input_device_detail_load(
     let device_configuration = input_device.configuration.clone().unwrap();
     let channels = device_configuration.channels();
 
-    // Set all channels as selected by default
-    let mut initial_selected_chanels = vec![];
-    for channel in 0..channels {
-        initial_selected_chanels.push(channel);
-    }
-    configuration.selected_device_channels = initial_selected_chanels;
-
     // Create an audio stream for each channel
     let mut audio_stream_channels = vec![];
     for _ in 0..device_configuration.channels() {
@@ -121,7 +114,8 @@ pub fn input_device_detail_load(
                         .with_children(|builder| {
                             // Audio bars
                             for channel in 0..channels {
-                                spawn_audio_bar(builder, &asset_server, channel);
+                                let is_selected_initially = configuration.selected_device_channels.contains(&channel);
+                                spawn_audio_bar(builder, &asset_server, channel, is_selected_initially);
                             }
                         });
                 });

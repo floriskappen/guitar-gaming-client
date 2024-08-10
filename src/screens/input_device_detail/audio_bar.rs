@@ -23,8 +23,15 @@ const BORDER_COLOR_UNSELECTED: Color = Color::srgba(0.92, 0.27, 0.09, 0.1);
 pub fn spawn_audio_bar(
     builder: &mut ChildBuilder,
     asset_server: &Res<AssetServer>,
-    channel: u16
+    channel: u16,
+    is_selected_initially: bool,
 ) {
+    let initial_border_color = if is_selected_initially {
+        BORDER_COLOR_SELECTED
+    } else { BORDER_COLOR_UNSELECTED };
+    let initial_visibilty = if is_selected_initially {
+        Visibility::Visible
+    } else { Visibility::Hidden };
 
     builder.spawn((
         ButtonBundle {
@@ -67,7 +74,7 @@ pub fn spawn_audio_bar(
                     height: Val::Px(300.0 + (8.0 * 2.0) + (4.0 * 2.0)),
                     ..Default::default()
                 },
-                border_color: BorderColor(BORDER_COLOR_SELECTED),
+                border_color: BorderColor(initial_border_color),
     
                 ..Default::default()
             },
@@ -99,7 +106,7 @@ pub fn spawn_audio_bar(
                     align_items: AlignItems::Center,
                     ..Default::default()
                 },
-                border_color: BorderColor(BORDER_COLOR_SELECTED),
+                border_color: BorderColor(initial_border_color),
                 ..Default::default()
             },
         )).with_children(|builder| {
@@ -111,6 +118,7 @@ pub fn spawn_audio_bar(
                     height: Val::Px(32.0),
                     ..Default::default()
                 },
+                visibility: initial_visibilty,
                 ..Default::default()
             }, AudioBarCheckIcon { channel }));
         });
@@ -119,8 +127,6 @@ pub fn spawn_audio_bar(
 }
 
 pub fn audio_bar_system(
-    commands: Commands,
-    asset_server: Res<AssetServer>,
     mut audio_bar: Query<(&mut Style, &AudioBar), With<AudioBar>>,
     mut audio_bar_check_icon: Query<(&mut Visibility, &AudioBarCheckIcon), With<AudioBarCheckIcon>>,
     mut audio_bar_wrapper_interaction_query: Query<(&Interaction, &AudioBarWrapper, &Children), (Changed<Interaction>, With<Button>)>,
@@ -128,14 +134,12 @@ pub fn audio_bar_system(
     mut configuration: ResMut<ConfigurationResource>,
     mut input_device: ResMut<InputDeviceResource>,
 ) {
-    for (mut style, audio_bar) in audio_bar.iter_mut() {
-        let device_configuration = input_device.configuration.clone().unwrap();
-        
+    for (mut style, audio_bar) in audio_bar.iter_mut() {        
         if let Some(audio_stream_channels) = &mut input_device.audio_stream_channels {
             let audio_bar_channel_usize = audio_bar.channel as usize;
 
             if audio_stream_channels[audio_bar_channel_usize].is_none() {
-                audio_stream_channels[audio_bar_channel_usize] = Some(AudioStream::new(configuration.device.clone().unwrap(), audio_bar.channel, 1024).unwrap())
+                audio_stream_channels[audio_bar_channel_usize] = Some(AudioStream::new(configuration.device.clone().unwrap(), vec![audio_bar.channel], 1024).unwrap())
             }
 
             if let Some(audio_stream) = &mut audio_stream_channels[audio_bar_channel_usize] {

@@ -119,10 +119,13 @@ pub fn input_device_overview_update(
             let channels = config.channels();
 
             configuration.device = Some(device);
+            let mut initial_selected_chanels = vec![];
             for channel in 0..channels {
-                configuration.selected_device_channels.push(channel)
+                initial_selected_chanels.push(channel);
             }
             input_device.configuration = Some(config.clone());
+            configuration.selected_device_channels = initial_selected_chanels;
+
             next_state.set(AppState::InputDeviceDetail);
         } else {
             handle_generic_interaction(interaction, &mut color)
