@@ -1,15 +1,17 @@
 use std::f32::consts::PI;
 
-use bevy::{color::palettes::css::ORANGE_RED, pbr::CascadeShadowConfigBuilder, prelude::*, render::mesh::PlaneMeshBuilder};
+use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_note::spawn_song_note, song_notes::spawn_song_notes}, constants::ingame::{FRET_AMOUNT, FRET_CENTERS, NOTE_START_LOCATION_X, STRING_CENTERS}, resources::song_loaded::SongLoadedResource, states::app_state::AppState};
+use crate::{components::{button_minimal::spawn_button_minimal, song_timeline::spawn_song_timeline}, constants::ingame::{FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS}, resources::song_loaded::SongLoadedResource, states::app_state::AppState};
 
 
 #[derive(Component)]
 pub struct SongPlayMarker;
 #[derive(Component)]
 pub struct BackButtonMarker;
+#[derive(Component)]
+pub struct SecondsPassedMarker;
 
 pub fn song_play_load(
     mut commands: Commands,
@@ -24,12 +26,12 @@ pub fn song_play_load(
     // 3D
     commands.spawn((Camera3dBundle {
         projection: Projection::Perspective(PerspectiveProjection {
-            fov: (25 as f32).to_radians(),
+            fov: 25_f32.to_radians(),
             ..Default::default()
         }),
         transform: Transform {
-            translation: Vec3 { x: 16.0, y: -6.0, z: 4.5 },
-            rotation: Quat { x: 0.426, y: 0.508, z: 0.574, w: 0.481 },
+            translation: Vec3 { x: 19.0, y: -6.0, z: 8.5 },
+            rotation: Quat { w: 0.530857,  x: 0.407341, y: 0.452398, z: 0.589576 },
             ..Default::default()
         },
         camera: Camera {
@@ -55,9 +57,26 @@ pub fn song_play_load(
             },
             ..default()
         });
+
+        builder.spawn(PbrBundle {
+            mesh: meshes.add(Mesh::from(Cuboid::new(1.0, 1.0, 1.0))),
+            material: materials.add(StandardMaterial {
+                base_color: Color::srgb(0.9, 0.4, 0.4),
+                perceptual_roughness: 0.9,
+                metallic: 0.0,
+                ..Default::default()
+            }),
+            transform: Transform {
+                translation: Vec3 { x: 0.0, y: FRET_CENTERS[0], z: STRING_CENTERS[4] },
+                rotation: Quat::from_rotation_x(90_f32.to_radians()),
+                // scale: Vec3 { x: 10.0, ..Default::default() },
+                ..Default::default()
+            },
+            ..default()
+        });
     
-        // Notes
-        spawn_song_notes(builder);
+        // Song timeline
+        spawn_song_timeline(builder, &mut meshes, &mut materials);
     
         let font = asset_server.load("fonts/IBMPlexMono-Regular.ttf");
     
@@ -86,69 +105,21 @@ pub fn song_play_load(
                 ..default()
             }));
         }
-
-        // Test
-        for (fret_index, fret_center) in FRET_CENTERS.iter().enumerate() {
-            if fret_index == 0 {
-                builder.spawn(PbrBundle {
-                    mesh: meshes.add(Mesh::from(PlaneMeshBuilder { plane: Plane3d { normal: Dir3::Y, half_size: Vec2::new(30.0, 0.02) }, subdivisions: 0 }.build())),
-                    material: materials.add(StandardMaterial {
-                        // base_color_texture: Some(asset_server.load("path/to/your/image.png")),
-                        base_color: Color::WHITE,
-                        ..Default::default()
-                    }),
-                    transform: Transform {
-                        translation: Vec3::new(-30.0, fret_center - 0.6, 0.0),
-                        // rotation: Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2),
-                        rotation: Quat::from_rotation_x(90_f32.to_radians()),
-                        scale: Vec3::new(1.0, 1.0, 1.0),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                });
-            }
-
-            builder.spawn(
-                PbrBundle {
-                    mesh: meshes.add(Mesh::from(PlaneMeshBuilder { plane: Plane3d { normal: Dir3::Y, half_size: Vec2::new(30.0, 0.02) }, subdivisions: 0 }.build())),
-                    material: materials.add(StandardMaterial {
-                        // base_color_texture: Some(asset_server.load("path/to/your/image.png")),
-                        base_color: Color::WHITE,
-                        ..Default::default()
-                    }),
-                    transform: Transform {
-                        translation: Vec3::new(-30.0, fret_center + 0.6, 0.0),
-                        // rotation: Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2),
-                        rotation: Quat::from_rotation_x(90_f32.to_radians()),
-                        scale: Vec3::new(1.0, 1.0, 1.0),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                }
-            );
-        }
     
         // Directional 'sun' light
         builder.spawn(DirectionalLightBundle {
             directional_light: DirectionalLight {
-                illuminance: light_consts::lux::AMBIENT_DAYLIGHT * 2.,
+                illuminance: light_consts::lux::AMBIENT_DAYLIGHT * 1.5,
                 shadows_enabled: false,
+                shadow_depth_bias: 0.3,
+                shadow_normal_bias: 0.3,
                 ..default()
             },
             transform: Transform {
-                translation: Vec3::new(0.0, 2.0, 0.0),
-                rotation: Quat::from_rotation_x(-PI / 4.),
+                translation: Vec3::new(0.0, 0.0, 0.0),
+                rotation: Quat::from_euler(EulerRot::XYZ, -PI / 4., PI / 8., 0.0),
                 ..default()
             },
-            // The default cascade config is designed to handle large scenes.
-            // As this example has a much smaller world, we can tighten the shadow
-            // bounds for better visual quality.
-            cascade_shadow_config: CascadeShadowConfigBuilder {
-                first_cascade_far_bound: 4.0,
-                maximum_distance: 10.0,
-                ..default()
-            }
-            .into(),
             ..default()
         });
     });
@@ -192,6 +163,24 @@ pub fn song_play_load(
                     "< back to song select",
                     BackButtonMarker
                 );
+
+                // Seconds passed
+                builder.spawn(NodeBundle {
+                    style: Style {
+                        width: Val::Px(100.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }).with_children(|builder| {
+                    builder.spawn((TextBundle::from_section(
+                        "0.00",
+                        TextStyle {
+                            font: asset_server.load("fonts/IBMPlexMono-Medium.ttf"),
+                            font_size: 16.0,
+                            color: Color::WHITE,
+                        },
+                    ), SecondsPassedMarker));
+                });
         });
 
         // Content
@@ -220,23 +209,38 @@ pub fn song_play_load(
                         font: asset_server.load("fonts/IBMPlexMono-Regular.ttf"),
                         font_size: 18.0,
                         color: Color::WHITE,
-                    }
+                    },
                 ));
             });
         });
 }
 
 pub fn song_play_update(
-    mut commands: Commands,
+    commands: Commands,
     asset_server: Res<AssetServer>,
+    time: Res<Time>,
     back_button_query_interaction: Query<&Interaction, With<BackButtonMarker>>,
+    mut seconds_passed_query: Query<&mut Text, With<SecondsPassedMarker>>,
     mut next_state: ResMut<NextState<AppState>>,
+    mut song_loaded: ResMut<SongLoadedResource>,
 ) {
     for interaction in back_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
             next_state.set(AppState::SongSelect);
         }
     }
+
+    if let Some(mut song_progress) = song_loaded.progress.clone() {
+        song_progress.timer.tick(time.delta());
+
+        for mut text in seconds_passed_query.iter_mut() {
+            text.sections[0].value = song_progress.timer.elapsed_secs().to_string()
+        }
+
+        song_loaded.progress = Some(song_progress);
+
+    }
+
 }
 
 pub fn song_play_cleanup(

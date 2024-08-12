@@ -1,5 +1,6 @@
-pub const NOTE_END_LOCATION_X: f32 = -0.4;
-pub const NOTE_START_LOCATION_X: f32 = -30.0;
+use bevy::prelude::*;
+
+pub const TIMELINE_LENGTH: f32 = 60.0;
 
 // Z coordinate
 pub const STRING_CENTERS: [f32; 6] = [
@@ -9,6 +10,15 @@ pub const STRING_CENTERS: [f32; 6] = [
     0.9,
     1.2,
     1.5
+];
+
+pub const STRING_COLORS: [Color; 6] = [
+    Color::srgb(1.0, 0.2, 0.2),
+    Color::srgb(0.2, 1.0, 0.2),
+    Color::srgb(1.0, 1.0, 0.2),
+    Color::srgb(0.2, 0.2, 1.0),
+    Color::srgb(0.2, 1.0, 0.9),
+    Color::srgb(0.9, 0.17, 1.0),
 ];
 
 pub const FRET_AMOUNT: usize = 25;

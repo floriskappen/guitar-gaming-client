@@ -20,5 +20,5 @@ pub fn get_songs_dir() -> Option<PathBuf> {
         return Some(songs_dir)
     }
 
-    return None;
+    None
 }

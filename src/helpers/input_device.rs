@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use cpal::{traits::{DeviceTrait, StreamTrait}, BufferSize, Device, SampleRate, StreamConfig};
-use pitch_detection::detector::{mcleod::McLeodDetector, PitchDetector};
+use pitch_detection::detector::PitchDetector;
 use pitch_detection::detector::autocorrelation::AutocorrelationDetector;
 
 const POWER_THRESHOLD: f32 = 0.15;
@@ -106,6 +106,6 @@ impl AudioStream {
             return Some(pitch.frequency)
         }
 
-        return None
+        None
     }
 }

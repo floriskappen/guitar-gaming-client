@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{components::button_minimal::spawn_button_minimal, helpers::song_library::scan_song_library, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
+use crate::{components::button_minimal::spawn_button_minimal, helpers::song_library::scan_song_library, resources::{song_library::SongLibraryResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::song_list::{spawn_song_list, SongListItemMarker};
 

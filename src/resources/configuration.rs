@@ -17,7 +17,8 @@ pub struct ConfigurationResourceSerializable {
 #[derive(Resource)]
 pub struct ConfigurationResource {
     pub device: Option<Device>,
-    pub selected_device_channels: Vec<u16>
+    pub selected_device_channels: Vec<u16>,
+    pub approach_rate: f32 // Meters/units per second
 }
 
 impl Default for ConfigurationResource {
@@ -25,7 +26,8 @@ impl Default for ConfigurationResource {
 
         ConfigurationResource {
             device: None,
-            selected_device_channels: vec![]
+            selected_device_channels: vec![],
+            approach_rate: 10.0,
         }
     }
 }
@@ -68,13 +70,14 @@ impl ConfigurationResource {
                     info!("{:?}", serializable_configuration);
                     return ConfigurationResource {
                         device: Some(found_device),
-                        selected_device_channels: serializable_configuration.selected_device_channels
+                        selected_device_channels: serializable_configuration.selected_device_channels,
+                        ..default()
                     }
                 }
             }
         }
 
-        return ConfigurationResource::default();
+        ConfigurationResource::default()
 
     }
 }

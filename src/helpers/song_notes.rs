@@ -44,5 +44,5 @@ pub fn note_with_octave_string_to_midi_pitch(note: &str) -> Option<usize> {
         }
     }
 
-    return None;
+    None
 }

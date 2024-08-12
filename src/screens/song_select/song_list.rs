@@ -23,7 +23,7 @@ pub fn spawn_song_list(
             ..Default::default()
         })
     .with_children(|builder| {
-        if song_metadata_list.len() > 0 {
+        if !song_metadata_list.is_empty() {
             for song_metadata in song_metadata_list {
                 builder.spawn((ButtonBundle {
                     style: Style {

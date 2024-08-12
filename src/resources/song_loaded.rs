@@ -19,6 +19,7 @@ pub struct SongLoadedProgress {
 }
 
 #[derive(Resource, Debug)]
+#[derive(Default)]
 pub struct SongLoadedResource {
     pub metadata: Option<SongMetadata>,
     // pub audio: // TODO,
@@ -26,23 +27,6 @@ pub struct SongLoadedResource {
     pub progress: Option<SongLoadedProgress>
 }
 
-impl Default for SongLoadedResource {
-    fn default() -> Self {
-        Self {
-            metadata: None,
-            notes: Some(vec![
-                NoteEvent {
-                    start_time_seconds: 1.0,
-                    duration_seconds: 1.0,
-                    string_index: 0,
-                    fret_index: 0,
-                    identifier: Uuid::new_v4(),
-                }
-            ]),
-            progress: None,
-        }
-    }
-}
 
 impl SongLoadedResource {
     pub fn load_song(&mut self, song_metadata: SongMetadata) {
@@ -53,44 +37,44 @@ impl SongLoadedResource {
         // TODO: properly load notes
         let mut notes_test = vec![
             NoteEvent {
-                start_time_seconds: 1.0,
+                start_time_seconds: 6.0,
                 duration_seconds: 1.0,
                 string_index: 0,
                 fret_index: 0,
                 identifier: Uuid::new_v4(),
             },
             NoteEvent {
-                start_time_seconds: 1.5,
-                duration_seconds: 1.0,
-                string_index: 0,
-                fret_index: 1,
-                identifier: Uuid::new_v4(),
-            },
-            NoteEvent {
-                start_time_seconds: 2.0,
-                duration_seconds: 1.0,
-                string_index: 0,
-                fret_index: 2,
-                identifier: Uuid::new_v4(),
-            },
-            NoteEvent {
-                start_time_seconds: 2.5,
-                duration_seconds: 1.0,
-                string_index: 0,
-                fret_index: 0,
-                identifier: Uuid::new_v4(),
-            },
-            NoteEvent {
-                start_time_seconds: 3.0,
+                start_time_seconds: 6.5,
                 duration_seconds: 1.0,
                 string_index: 1,
                 fret_index: 1,
                 identifier: Uuid::new_v4(),
             },
             NoteEvent {
-                start_time_seconds: 3.5,
+                start_time_seconds: 7.0,
                 duration_seconds: 1.0,
-                string_index: 0,
+                string_index: 2,
+                fret_index: 2,
+                identifier: Uuid::new_v4(),
+            },
+            NoteEvent {
+                start_time_seconds: 7.5,
+                duration_seconds: 1.0,
+                string_index: 3,
+                fret_index: 0,
+                identifier: Uuid::new_v4(),
+            },
+            NoteEvent {
+                start_time_seconds: 8.0,
+                duration_seconds: 1.0,
+                string_index: 4,
+                fret_index: 1,
+                identifier: Uuid::new_v4(),
+            },
+            NoteEvent {
+                start_time_seconds: 8.5,
+                duration_seconds: 1.0,
+                string_index: 5,
                 fret_index: 2,
                 identifier: Uuid::new_v4(),
             },

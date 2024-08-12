@@ -19,7 +19,7 @@ mod components {
     pub mod button_primary;
     pub mod button_minimal;
     pub mod song_note;
-    pub mod song_notes;
+    pub mod song_timeline;
 }
 mod screens {
     pub mod input_device_overview {

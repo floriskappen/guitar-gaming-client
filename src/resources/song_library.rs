@@ -51,7 +51,7 @@ impl SongLibraryResource {
             return serializable_configuration
         }
 
-        return SongLibraryResource::default();
+        SongLibraryResource::default()
     }
 
     pub fn find_by_id(&self, uuid: &String) -> Option<&SongMetadata> {

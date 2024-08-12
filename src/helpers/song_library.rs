@@ -1,4 +1,4 @@
-use std::{fs::{self, File}, io::{BufReader, Read}};
+use std::{fs::{self, File}, io::Read};
 
 use crate::resources::song_library::SongMetadata;
 use crate::helpers::persistence::get_songs_dir;
@@ -35,5 +35,5 @@ pub fn scan_song_library() -> Result<Vec<SongMetadata>, Box<dyn std::error::Erro
         }
     }
 
-    return Ok(song_metadata_list);
+    Ok(song_metadata_list)
 }
