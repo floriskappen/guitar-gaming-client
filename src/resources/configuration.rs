@@ -65,7 +65,7 @@ impl ConfigurationResource {
                 let device = devices.into_iter().find(|device| &device.name().unwrap() == device_name);
                 if let Some(found_device) = device {
 
-                    println!("{:?}", serializable_configuration);
+                    info!("{:?}", serializable_configuration);
                     return ConfigurationResource {
                         device: Some(found_device),
                         selected_device_channels: serializable_configuration.selected_device_channels

@@ -11,7 +11,9 @@ const FILENAME: &str = "song_library.json";
 pub struct SongMetadata {
     pub uuid: String,
     pub title: String,
-    pub artists: Vec<String>
+    pub artists: Vec<String>,
+    pub tuning: [String; 6],
+    pub duration_seconds: f32,
 }
 
 #[derive(Resource, Debug, Serialize, Deserialize)]
@@ -45,7 +47,7 @@ impl SongLibraryResource {
             // Deserialize the JSON contents into the serializable struct
             let serializable_configuration: SongLibraryResource =
                 serde_json::from_str(&contents).expect("Failed to deserialize JSON");
-            println!("{:?}", serializable_configuration);
+            info!("{:?}", serializable_configuration);
             return serializable_configuration
         }
 

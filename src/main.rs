@@ -1,8 +1,13 @@
 use bevy::prelude::*;
+use bevy_mod_billboard::plugin::BillboardPlugin;
+use helpers::persistence::get_data_dir;
 use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource};
 use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin, song_play::plugin::SongPlayPlugin, song_select::plugin::SongSelectPlugin, tune::plugin::TunePlugin};
 use states::app_state::AppState;
 
+mod constants {
+    pub mod ingame;
+}
 mod resources {
     pub mod input_devices;
     pub mod configuration;
@@ -13,6 +18,8 @@ mod resources {
 mod components {
     pub mod button_primary;
     pub mod button_minimal;
+    pub mod song_note;
+    pub mod song_notes;
 }
 mod screens {
     pub mod input_device_overview {
@@ -46,9 +53,11 @@ mod helpers {
     pub mod tuning;
     pub mod persistence;
     pub mod song_library;
+    pub mod song_notes;
 }
 
 fn main() {
+
     let mut app = App::new();
     app.add_plugins(DefaultPlugins.set(WindowPlugin {
         primary_window: Some(Window {
@@ -57,6 +66,8 @@ fn main() {
         }),
         ..Default::default()
     }));
+
+    app.add_plugins(BillboardPlugin);
 
     let configuration_resource = ConfigurationResource::load_from_disk();
     if configuration_resource.device.is_some() && !configuration_resource.selected_device_channels.is_empty() {
@@ -76,6 +87,9 @@ fn main() {
     app.add_plugins(TunePlugin);
     app.add_plugins(SongSelectPlugin);
     app.add_plugins(SongPlayPlugin);
+
+    let directory = get_data_dir().unwrap();
+    info!("data directory: {:?}", directory);
 
     app.run();
 }
