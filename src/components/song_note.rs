@@ -14,12 +14,13 @@ pub fn spawn_song_note(
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     note_event: NoteEvent,
+    length: f32,
+    x_position: f32,
 ) {
-    let length = (note_event.duration_seconds * configuration.approach_rate)/2.0;
 
     builder.spawn((SpatialBundle {
         transform: Transform {
-            translation: Vec3 { x: -TIMELINE_LENGTH, y: FRET_CENTERS[note_event.fret_index], z: 0.0 },
+            translation: Vec3 { x: x_position, y: FRET_CENTERS[note_event.fret_index], z: 0.0 },
             ..Default::default()
         },
         ..Default::default()
@@ -43,12 +44,10 @@ pub fn spawn_song_note(
 
         // Note trail
         builder.spawn(PbrBundle {
-            mesh: meshes.add(PlaneMeshBuilder { plane: Plane3d { normal: Dir3::Y, half_size: Vec2::new(length, 0.55) }, subdivisions: 0 }.build()),
+            mesh: meshes.add(PlaneMeshBuilder { plane: Plane3d { normal: Dir3::Y, half_size: Vec2::new(length, 0.1) }, subdivisions: 0 }.build()),
             material: materials.add(StandardMaterial {
-                base_color: STRING_COLORS[note_event.string_index].with_luminance(0.8).with_alpha(0.6),
-                alpha_mode: AlphaMode::Blend,
+                base_color: STRING_COLORS[note_event.string_index].with_luminance(0.8),
                 perceptual_roughness: 0.9,
-                
                 metallic: 0.0,
                 ..Default::default()
             }),
@@ -127,31 +126,4 @@ pub fn spawn_song_note(
             });
         }
     });
-}
-
-pub fn move_song_notes(
-    mut commands: Commands,
-    song_loaded: Res<SongLoadedResource>,
-    configuration: Res<ConfigurationResource>,
-    mut song_notes_query: Query<(Entity, &mut Transform, &SongNote)>,
-) {
-    if let Some(song_progress) = song_loaded.progress.clone() {
-        let current_time = song_progress.timer.elapsed().as_secs_f32();
-
-        for (entity, mut note_transform, song_note) in song_notes_query.iter_mut() {
-            let length = (song_note.note_event.duration_seconds * configuration.approach_rate)/2.0;
-            let progress = (current_time + (TIMELINE_LENGTH / configuration.approach_rate) - song_note.note_event.start_time_seconds / song_note.note_event.duration_seconds) / (TIMELINE_LENGTH / configuration.approach_rate);
-
-            if progress < 1.0 {
-                let new_position_x = -TIMELINE_LENGTH + progress * (length + TIMELINE_LENGTH);
-                note_transform.translation = Vec3 {
-                    x: new_position_x,
-                    y: note_transform.translation.y,
-                    z: note_transform.translation.z,
-                }
-            } else {
-                commands.entity(entity).despawn_recursive();
-            }
-        }
-    }
 }

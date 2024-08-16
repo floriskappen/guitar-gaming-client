@@ -1,15 +1,15 @@
 use bevy::prelude::*;
 
-pub const TIMELINE_LENGTH: f32 = 60.0;
+pub const TIMELINE_LENGTH: f32 = 30.0;
 
 // Z coordinate
 pub const STRING_CENTERS: [f32; 6] = [
     0.0,
-    0.3,
-    0.6,
-    0.9,
-    1.2,
-    1.5
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5
 ];
 
 pub const STRING_COLORS: [Color; 6] = [
@@ -51,3 +51,5 @@ pub const FRET_CENTERS: [f32; FRET_AMOUNT] = [
     13.2,
     14.4
 ];
+
+pub const CAMERA_Y_RANGE: [f32; 2] = [-3.0, 25.6];

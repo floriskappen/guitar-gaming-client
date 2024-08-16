@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, prelude::*};
 use bevy_mod_billboard::plugin::BillboardPlugin;
 use helpers::persistence::get_data_dir;
 use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource};
@@ -43,6 +43,7 @@ mod screens {
     pub mod song_play {
         pub mod plugin;
         pub mod song_play;
+        pub mod camera;
     }
 }
 mod states {
@@ -66,6 +67,8 @@ fn main() {
         }),
         ..Default::default()
     }));
+    app.add_plugins(FrameTimeDiagnosticsPlugin::default());
+    app.add_plugins(LogDiagnosticsPlugin::default());
 
     app.add_plugins(BillboardPlugin);
 

@@ -3,7 +3,9 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_timeline::spawn_song_timeline}, constants::ingame::{FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS}, resources::song_loaded::SongLoadedResource, states::app_state::AppState};
+use crate::{components::{button_minimal::spawn_button_minimal, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS}, resources::song_loaded::SongLoadedResource, states::app_state::AppState};
+
+use super::camera::spawn_camera;
 
 
 #[derive(Component)]
@@ -12,6 +14,8 @@ pub struct SongPlayMarker;
 pub struct BackButtonMarker;
 #[derive(Component)]
 pub struct SecondsPassedMarker;
+#[derive(Component)]
+pub struct Camera3D;
 
 pub fn song_play_load(
     mut commands: Commands,
@@ -23,31 +27,15 @@ pub fn song_play_load(
 ) {
     clear_color.0 = Color::srgb(0.10, 0.10, 0.10);
 
-    // 3D
-    commands.spawn((Camera3dBundle {
-        projection: Projection::Perspective(PerspectiveProjection {
-            fov: 25_f32.to_radians(),
-            ..Default::default()
-        }),
-        transform: Transform {
-            translation: Vec3 { x: 19.0, y: -6.0, z: 8.5 },
-            rotation: Quat { w: 0.530857,  x: 0.407341, y: 0.452398, z: 0.589576 },
-            ..Default::default()
-        },
-        camera: Camera {
-            order: 1,
-            
-            ..Default::default()
-        },
-        ..default()
-    }, SongPlayMarker));
-
     // Content
     commands.spawn((
         SpatialBundle {
             ..Default::default()
         }, SongPlayMarker
     )).with_children(|builder| {
+        // 3D camera
+        spawn_camera(builder, Vec3 { x: 8.5, y: CAMERA_Y_RANGE[0], z: 10.6 });
+
         // Guitar neck model
         builder.spawn(SceneBundle {
             scene: asset_server.load("models/ingame/guitar_neck.glb#Scene0"),
@@ -58,23 +46,6 @@ pub fn song_play_load(
             ..default()
         });
 
-        builder.spawn(PbrBundle {
-            mesh: meshes.add(Mesh::from(Cuboid::new(1.0, 1.0, 1.0))),
-            material: materials.add(StandardMaterial {
-                base_color: Color::srgb(0.9, 0.4, 0.4),
-                perceptual_roughness: 0.9,
-                metallic: 0.0,
-                ..Default::default()
-            }),
-            transform: Transform {
-                translation: Vec3 { x: 0.0, y: FRET_CENTERS[0], z: STRING_CENTERS[4] },
-                rotation: Quat::from_rotation_x(90_f32.to_radians()),
-                // scale: Vec3 { x: 10.0, ..Default::default() },
-                ..Default::default()
-            },
-            ..default()
-        });
-    
         // Song timeline
         spawn_song_timeline(builder, &mut meshes, &mut materials);
     
@@ -117,7 +88,7 @@ pub fn song_play_load(
             },
             transform: Transform {
                 translation: Vec3::new(0.0, 0.0, 0.0),
-                rotation: Quat::from_euler(EulerRot::XYZ, -PI / 4., PI / 8., 0.0),
+                rotation: Quat::from_euler(EulerRot::XYZ, (-16 as f32).to_radians(), (26 as f32).to_radians(), 0.0),
                 ..default()
             },
             ..default()
@@ -216,8 +187,6 @@ pub fn song_play_load(
 }
 
 pub fn song_play_update(
-    commands: Commands,
-    asset_server: Res<AssetServer>,
     time: Res<Time>,
     back_button_query_interaction: Query<&Interaction, With<BackButtonMarker>>,
     mut seconds_passed_query: Query<&mut Text, With<SecondsPassedMarker>>,

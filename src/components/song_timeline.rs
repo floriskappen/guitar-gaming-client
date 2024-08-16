@@ -2,7 +2,7 @@ use bevy::{prelude::*, render::mesh::PlaneMeshBuilder};
 
 use crate::{constants::ingame::{FRET_CENTERS, TIMELINE_LENGTH}, resources::{configuration::ConfigurationResource, song_loaded::SongLoadedResource}};
 
-use super::song_note::spawn_song_note;
+use super::song_note::{spawn_song_note, SongNote};
 
 #[derive(Component)]
 pub struct SongNotes;
@@ -66,31 +66,54 @@ pub fn spawn_song_timeline(
 
 pub fn manage_song_timeline(
     mut commands: Commands,
-    mut song_loaded: ResMut<SongLoadedResource>,
+    song_loaded: Res<SongLoadedResource>,
     song_notes_wrapper_query: Query<Entity, With<SongNotes>>,
+    mut song_notes_query: Query<(Entity, &mut Transform, &SongNote)>,
     configuration: Res<ConfigurationResource>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    if let Some(mut song_progress) = song_loaded.progress.clone() {
+    if let Some(song_progress) = song_loaded.progress.clone() {
         let current_time = song_progress.timer.elapsed().as_secs_f32();
+        let note_events = song_loaded.notes.clone().unwrap();
+        let approach_time = TIMELINE_LENGTH / configuration.approach_rate;
 
-        let index = 0;
-        while let Some(note_event) = song_progress.notes_remaining.get(index) {
-            if note_event.start_time_seconds - (TIMELINE_LENGTH / configuration.approach_rate) <= current_time {
-                // Spawn note
-                for entity in song_notes_wrapper_query.iter() {
-                    commands.entity(entity).with_children(|builder| {
-                        spawn_song_note(builder, &configuration, &mut meshes, &mut materials, note_event.clone());
-                    });
+        let song_notes_wrapper = song_notes_wrapper_query.iter().next().unwrap();
+
+        for note_event in note_events {
+            // If we have reached a note that has yet to be spawned we can skip it.
+            // Since the notes are sorted by time we know the same will be true for all note events to come, so we can break out of the loop
+            if note_event.start_time_seconds - approach_time > current_time {
+                break
+            }
+
+            let existing_song_note = song_notes_query.iter_mut().find(|(_, _, song_note)| {
+                return song_note.note_event.identifier == note_event.identifier;
+            });
+
+            // If the note has already passed
+            if (note_event.start_time_seconds + note_event.duration_seconds) < current_time {
+                // Despawn the song note if it exists
+                if let Some((entity, _, _)) = existing_song_note {
+                    info!("Despawned note");
+                    commands.entity(entity).despawn_recursive();
                 }
+                continue;
+            }
 
-                song_progress.notes_remaining.remove(index);
+            let length = (note_event.duration_seconds * configuration.approach_rate)/2.0;
+            let progress = (current_time + (TIMELINE_LENGTH / configuration.approach_rate) - (note_event.start_time_seconds + note_event.duration_seconds)) / (TIMELINE_LENGTH / configuration.approach_rate);
+            let new_position_x = -TIMELINE_LENGTH + progress * (length + TIMELINE_LENGTH) + 0.3;
+            
+            if let Some((_, mut transform, _)) = existing_song_note {
+                transform.translation.x = new_position_x;
             } else {
-                break;
+                commands.entity(song_notes_wrapper).with_children(|builder| {
+                    spawn_song_note(builder, &configuration, &mut meshes, &mut materials, note_event, length, new_position_x);
+                });
+
+                info!("Spawned note");
             }
         }
-
-        song_loaded.progress = Some(song_progress);
     }
 }
