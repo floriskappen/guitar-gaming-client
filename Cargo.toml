@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+aubio-rs = { version = "0.2.0", features = ["bindgen", "builtin"] }
 bevy = "0.14.1"
 bevy_mod_billboard = "0.7.0"
 cpal = "0.15.3"
