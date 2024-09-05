@@ -6,6 +6,7 @@ use crate::{constants::ingame::{FRET_CENTERS, TIMELINE_LENGTH, STRING_CENTERS, S
 #[derive(Component)]
 pub struct SongNote {
     pub note_event: NoteEvent,
+    pub triggered: bool,
 }
 
 pub fn spawn_song_note(
@@ -24,7 +25,7 @@ pub fn spawn_song_note(
             ..Default::default()
         },
         ..Default::default()
-    }, SongNote { note_event: note_event.clone() })).with_children(|builder| {
+    }, SongNote { note_event: note_event.clone(), triggered: false })).with_children(|builder| {
 
         // Note front
         builder.spawn(PbrBundle {

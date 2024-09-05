@@ -26,6 +26,8 @@ impl AudioStream {
         let channels = config.channels();
         let sample_rate = config.sample_rate();
 
+        println!("sample rate: {} buffer size: {} duration seconds: {}", sample_rate.0, buffer_size, buffer_size as f32 / sample_rate.0 as f32);
+
         let buffer = Arc::new(Mutex::new(Vec::with_capacity(buffer_size)));
         let buffer_clone = Arc::clone(&buffer);
 
