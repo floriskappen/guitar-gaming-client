@@ -1,9 +1,7 @@
-use std::f32::consts::PI;
-
 use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS}, resources::song_loaded::SongLoadedResource, states::app_state::AppState};
+use crate::{components::{button_minimal::spawn_button_minimal, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS}, helpers::input_device::{self, AudioStream}, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::camera::spawn_camera;
 
@@ -14,8 +12,6 @@ pub struct SongPlayMarker;
 pub struct BackButtonMarker;
 #[derive(Component)]
 pub struct SecondsPassedMarker;
-#[derive(Component)]
-pub struct Camera3D;
 
 pub fn song_play_load(
     mut commands: Commands,
@@ -23,8 +19,12 @@ pub fn song_play_load(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     song_loaded: Res<SongLoadedResource>,
-    mut clear_color: ResMut<ClearColor>
+    mut clear_color: ResMut<ClearColor>,
+    mut input_device: ResMut<InputDeviceResource>,
+    configuration: Res<ConfigurationResource>,
 ) {
+    input_device.audio_stream_main = Some(AudioStream::new(configuration.device.clone().unwrap(), configuration.selected_device_channels.clone(), 1024).unwrap());
+
     clear_color.0 = Color::srgb(0.10, 0.10, 0.10);
 
     // Content
@@ -192,6 +192,7 @@ pub fn song_play_update(
     mut seconds_passed_query: Query<&mut Text, With<SecondsPassedMarker>>,
     mut next_state: ResMut<NextState<AppState>>,
     mut song_loaded: ResMut<SongLoadedResource>,
+    input_device: Res<InputDeviceResource>,
 ) {
     for interaction in back_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
@@ -201,14 +202,29 @@ pub fn song_play_update(
 
     if let Some(mut song_progress) = song_loaded.progress.clone() {
         song_progress.timer.tick(time.delta());
+        let elapsed_secs = song_progress.timer.elapsed_secs();
 
         for mut text in seconds_passed_query.iter_mut() {
-            text.sections[0].value = song_progress.timer.elapsed_secs().to_string()
+            text.sections[0].value = elapsed_secs.to_string()
+        }
+
+        if let Some(audio_stream) = &input_device.audio_stream_main {
+            // Debounce
+            if song_progress.previous_onset_secs + 0.08 < elapsed_secs {
+                if let Ok(has_onset) = audio_stream.get_onset() {
+                    if has_onset {
+                        info!("onset detected!");
+                        song_progress.previous_onset_secs = elapsed_secs
+                    }
+                }
+            }
+        } else {
+            error!("no audio stream :c")
         }
 
         song_loaded.progress = Some(song_progress);
-
     }
+
 
 }
 

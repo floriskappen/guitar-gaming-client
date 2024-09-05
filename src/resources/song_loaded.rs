@@ -15,6 +15,7 @@ pub struct NoteEventWithScore {
 pub struct SongLoadedProgress {
     pub timer: Timer,
     pub notes_with_score: Vec<NoteEventWithScore>,
+    pub previous_onset_secs: f32
 }
 
 #[derive(Resource, Debug)]
@@ -116,6 +117,7 @@ impl SongLoadedResource {
         self.progress = Some(SongLoadedProgress {
             timer: Timer::from_seconds(song_metadata.duration_seconds, TimerMode::Once),
             notes_with_score: vec![],
+            previous_onset_secs: 0.0,
         })
     }
 }
