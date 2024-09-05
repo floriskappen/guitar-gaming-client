@@ -12,6 +12,8 @@ pub struct SongPlayMarker;
 pub struct BackButtonMarker;
 #[derive(Component)]
 pub struct SecondsPassedMarker;
+#[derive(Component)]
+pub struct DebugOnsetMarker;
 
 pub fn song_play_load(
     mut commands: Commands,
@@ -182,6 +184,19 @@ pub fn song_play_load(
                         color: Color::WHITE,
                     },
                 ));
+
+                builder.spawn((
+                    NodeBundle {
+                        style: Style {
+                            width: Val::Px(20.0),
+                            height: Val::Px(20.0),
+                            ..Default::default()
+                        },
+                        background_color: BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0)),
+                        ..Default::default()
+                    },
+                    DebugOnsetMarker
+                ));
             });
         });
 }
@@ -190,6 +205,7 @@ pub fn song_play_update(
     time: Res<Time>,
     back_button_query_interaction: Query<&Interaction, With<BackButtonMarker>>,
     mut seconds_passed_query: Query<&mut Text, With<SecondsPassedMarker>>,
+    mut debug_onset_marker: Query<&mut BackgroundColor, With<DebugOnsetMarker>>,
     mut next_state: ResMut<NextState<AppState>>,
     mut song_loaded: ResMut<SongLoadedResource>,
     input_device: Res<InputDeviceResource>,
@@ -209,17 +225,27 @@ pub fn song_play_update(
         }
 
         if let Some(audio_stream) = &input_device.audio_stream_main {
-            // Debounce
+            // Debounce - exact value yet to be determined after more experimentation
             if song_progress.previous_onset_secs + 0.08 < elapsed_secs {
                 if let Ok(has_onset) = audio_stream.get_onset() {
                     if has_onset {
                         info!("onset detected!");
-                        song_progress.previous_onset_secs = elapsed_secs
+                        song_progress.previous_onset_secs = elapsed_secs;
+
+                        for mut debug_onset_el in debug_onset_marker.iter_mut() {
+                            *debug_onset_el = BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 1.0));
+                        }
                     }
                 }
             }
         } else {
             error!("no audio stream :c")
+        }
+
+        if song_progress.previous_onset_secs + 0.08 < elapsed_secs {
+            for mut debug_onset_el in debug_onset_marker.iter_mut() {
+                *debug_onset_el = BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0));
+            }
         }
 
         song_loaded.progress = Some(song_progress);
