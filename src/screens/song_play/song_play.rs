@@ -1,9 +1,7 @@
-use std::f32::consts::PI;
-
 use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS}, resources::song_loaded::SongLoadedResource, states::app_state::AppState};
+use crate::{components::{button_minimal::spawn_button_minimal, song_note::SongNote, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS, STRING_COLORS}, helpers::input_device::{self, AudioStream}, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::camera::spawn_camera;
 
@@ -15,7 +13,7 @@ pub struct BackButtonMarker;
 #[derive(Component)]
 pub struct SecondsPassedMarker;
 #[derive(Component)]
-pub struct Camera3D;
+pub struct DebugOnsetMarker;
 
 pub fn song_play_load(
     mut commands: Commands,
@@ -23,8 +21,12 @@ pub fn song_play_load(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     song_loaded: Res<SongLoadedResource>,
-    mut clear_color: ResMut<ClearColor>
+    mut clear_color: ResMut<ClearColor>,
+    mut input_device: ResMut<InputDeviceResource>,
+    configuration: Res<ConfigurationResource>,
 ) {
+    input_device.audio_stream_main = Some(AudioStream::new(configuration.device.clone().unwrap(), configuration.selected_device_channels.clone(), 1024).unwrap());
+
     clear_color.0 = Color::srgb(0.10, 0.10, 0.10);
 
     // Content
@@ -182,16 +184,35 @@ pub fn song_play_load(
                         color: Color::WHITE,
                     },
                 ));
+
+                builder.spawn((
+                    NodeBundle {
+                        style: Style {
+                            width: Val::Px(20.0),
+                            height: Val::Px(20.0),
+                            ..Default::default()
+                        },
+                        background_color: BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0)),
+                        ..Default::default()
+                    },
+                    DebugOnsetMarker
+                ));
             });
         });
 }
 
 pub fn song_play_update(
+    mut commands: Commands,
     time: Res<Time>,
     back_button_query_interaction: Query<&Interaction, With<BackButtonMarker>>,
     mut seconds_passed_query: Query<&mut Text, With<SecondsPassedMarker>>,
+    mut debug_onset_marker: Query<&mut BackgroundColor, With<DebugOnsetMarker>>,
     mut next_state: ResMut<NextState<AppState>>,
     mut song_loaded: ResMut<SongLoadedResource>,
+    mut pbr_query: Query<&mut Handle<StandardMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    input_device: Res<InputDeviceResource>,
+    mut song_notes_query: Query<(&SongNote, &Children)>,
 ) {
     for interaction in back_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
@@ -201,14 +222,58 @@ pub fn song_play_update(
 
     if let Some(mut song_progress) = song_loaded.progress.clone() {
         song_progress.timer.tick(time.delta());
+        let elapsed_secs = song_progress.timer.elapsed_secs();
 
         for mut text in seconds_passed_query.iter_mut() {
-            text.sections[0].value = song_progress.timer.elapsed_secs().to_string()
+            text.sections[0].value = elapsed_secs.to_string()
+        }
+
+        if let Some(audio_stream) = &input_device.audio_stream_main {
+            // Debounce - exact value yet to be determined after more experimentation
+            if song_progress.previous_onset_secs + 0.1 < elapsed_secs {
+                if let Ok(has_onset) = audio_stream.get_onset() {
+                    if has_onset {
+                        song_progress.previous_onset_secs = elapsed_secs;
+
+                        for (song_note, children) in song_notes_query.iter_mut() {
+                            if song_note.triggered {
+                                continue
+                            }
+
+                            // If the timing is somewhat close (tweak later)
+                            if song_note.note_event.start_time_seconds > elapsed_secs - 0.2 && song_note.note_event.start_time_seconds < elapsed_secs + 0.2 {
+                                for &child in children.iter() {
+                                    if let Ok(material_handle) = pbr_query.get_mut(child) {
+                                        // Get the current material and modify it
+                                        if let Some(material) = materials.get_mut(&*material_handle) {
+                                            // Update the base color or any other material property
+                                            material.base_color = STRING_COLORS[song_note.note_event.string_index].with_luminance(0.3);
+                                        }
+                                    }
+                                }
+                                break
+                            }
+                        }
+
+                        for mut debug_onset_el in debug_onset_marker.iter_mut() {
+                            *debug_onset_el = BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 1.0));
+                        }
+                    }
+                }
+            }
+        } else {
+            error!("no audio stream :c")
+        }
+
+        if song_progress.previous_onset_secs + 0.08 < elapsed_secs {
+            for mut debug_onset_el in debug_onset_marker.iter_mut() {
+                *debug_onset_el = BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0));
+            }
         }
 
         song_loaded.progress = Some(song_progress);
-
     }
+
 
 }
 

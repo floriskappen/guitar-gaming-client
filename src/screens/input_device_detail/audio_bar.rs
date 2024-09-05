@@ -143,7 +143,7 @@ pub fn audio_bar_system(
             }
 
             if let Some(audio_stream) = &mut audio_stream_channels[audio_bar_channel_usize] {
-                style.height = Val::Px((audio_stream.get_current_amplitude() * 200.0).min(300.0))
+                style.height = Val::Px((audio_stream.get_amplitude() * 200.0).min(300.0))
             }
         }
     }
