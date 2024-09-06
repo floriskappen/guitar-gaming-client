@@ -24,7 +24,7 @@ pub struct SongLoadedResource {
     pub metadata: Option<SongMetadata>,
     // pub audio: // TODO,
     pub notes: Option<Vec<NoteEvent>>,
-    pub progress: Option<SongLoadedProgress>
+    pub progress: Option<SongLoadedProgress>,
 }
 
 

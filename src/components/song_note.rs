@@ -1,7 +1,7 @@
 
 use bevy::{prelude::*, render::mesh::PlaneMeshBuilder};
 
-use crate::{constants::ingame::{FRET_CENTERS, TIMELINE_LENGTH, STRING_CENTERS, STRING_COLORS}, helpers::song_notes::NoteEvent, resources::{configuration::ConfigurationResource, song_loaded::SongLoadedResource}};
+use crate::{constants::ingame::{FRET_CENTERS, STRING_CENTERS, STRING_COLORS}, helpers::song_notes::NoteEvent};
 
 #[derive(Component)]
 pub struct SongNote {
@@ -11,7 +11,6 @@ pub struct SongNote {
 
 pub fn spawn_song_note(
     builder: &mut ChildBuilder,
-    configuration: &Res<ConfigurationResource>,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     note_event: NoteEvent,

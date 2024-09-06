@@ -14,6 +14,7 @@ mod resources {
     pub mod input_device;
     pub mod song_library;
     pub mod song_loaded;
+    pub mod output_audio_song;
 }
 mod components {
     pub mod button_primary;
@@ -53,7 +54,6 @@ mod helpers {
     pub mod input_device;
     pub mod tuning;
     pub mod persistence;
-    pub mod song_library;
     pub mod song_notes;
 }
 
@@ -67,7 +67,7 @@ fn main() {
         }),
         ..Default::default()
     }));
-    app.add_plugins(FrameTimeDiagnosticsPlugin::default());
+    app.add_plugins(FrameTimeDiagnosticsPlugin);
     app.add_plugins(LogDiagnosticsPlugin::default());
 
     app.add_plugins(BillboardPlugin);
