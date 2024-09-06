@@ -30,6 +30,7 @@ pub fn spawn_song_list(
                         padding: UiRect { left: Val::Px(12.0), right: Val::Px(12.0), top: Val::Px(8.0), bottom: Val::Px(12.0) },
                         width: Val::Px(350.0),
                         border: UiRect::all(Val::Px(4.0)),
+                        margin: UiRect::bottom(Val::Px(8.0)),
                         ..Default::default()
                     },
                     border_color: BorderColor(Color::srgb(0.35, 0.35, 0.35)),

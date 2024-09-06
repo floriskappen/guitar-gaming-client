@@ -88,7 +88,7 @@ pub fn manage_song_timeline(
             }
 
             let existing_song_note = song_notes_query.iter_mut().find(|(_, _, song_note)| {
-                return song_note.note_event.identifier == note_event.identifier;
+                song_note.note_event.identifier == note_event.identifier
             });
 
             // If the note has already passed
@@ -109,7 +109,7 @@ pub fn manage_song_timeline(
                 transform.translation.x = new_position_x;
             } else {
                 commands.entity(song_notes_wrapper).with_children(|builder| {
-                    spawn_song_note(builder, &configuration, &mut meshes, &mut materials, note_event, length, new_position_x);
+                    spawn_song_note(builder, &mut meshes, &mut materials, note_event, length, new_position_x);
                 });
 
                 info!("Spawned note");

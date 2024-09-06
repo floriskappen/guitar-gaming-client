@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{components::button_minimal::spawn_button_minimal, helpers::song_library::scan_song_library, resources::{song_library::SongLibraryResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
+use crate::{components::button_minimal::spawn_button_minimal, resources::{song_library::SongLibraryResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::song_list::{spawn_song_list, SongListItemMarker};
 
@@ -114,7 +114,7 @@ pub fn song_select_update(
     }
     for interaction in refresh_song_library_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed && buttons.just_pressed(MouseButton::Left) {
-            song_library.songs = scan_song_library().unwrap();
+            song_library.scan().unwrap();
             song_library.save_to_disk();
 
             for entity in song_list_wrapper_query.iter() {

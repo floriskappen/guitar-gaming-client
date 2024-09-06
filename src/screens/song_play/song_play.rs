@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_note::SongNote, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_CENTERS, STRING_COLORS}, helpers::input_device::{self, AudioStream}, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, song_loaded::SongLoadedResource}, states::app_state::AppState};
+use crate::{components::{button_minimal::spawn_button_minimal, song_note::SongNote, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_COLORS}, helpers::{input_device::AudioStream, persistence::get_songs_dir}, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, output_audio_song::{AudioCommand, OutputAudioControllerSong}, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::camera::spawn_camera;
 
@@ -23,8 +23,10 @@ pub fn song_play_load(
     song_loaded: Res<SongLoadedResource>,
     mut clear_color: ResMut<ClearColor>,
     mut input_device: ResMut<InputDeviceResource>,
+    output_audio_song: Res<OutputAudioControllerSong>,
     configuration: Res<ConfigurationResource>,
 ) {
+    // Set up the input audio stream
     input_device.audio_stream_main = Some(AudioStream::new(configuration.device.clone().unwrap(), configuration.selected_device_channels.clone(), 1024).unwrap());
 
     clear_color.0 = Color::srgb(0.10, 0.10, 0.10);
@@ -90,7 +92,7 @@ pub fn song_play_load(
             },
             transform: Transform {
                 translation: Vec3::new(0.0, 0.0, 0.0),
-                rotation: Quat::from_euler(EulerRot::XYZ, (-16 as f32).to_radians(), (26 as f32).to_radians(), 0.0),
+                rotation: Quat::from_euler(EulerRot::XYZ, (-16_f32).to_radians(), 26_f32.to_radians(), 0.0),
                 ..default()
             },
             ..default()
@@ -199,10 +201,16 @@ pub fn song_play_load(
                 ));
             });
         });
+    
+
+    // Play the audio
+    let song_directory = get_songs_dir().unwrap().join(
+        format!("{}/audio.mp3", song_loaded.metadata.as_ref().unwrap().uuid)
+    );
+    let _ = output_audio_song.sender.send(AudioCommand::Play(song_directory.to_str().unwrap().to_string()));
 }
 
 pub fn song_play_update(
-    mut commands: Commands,
     time: Res<Time>,
     back_button_query_interaction: Query<&Interaction, With<BackButtonMarker>>,
     mut seconds_passed_query: Query<&mut Text, With<SecondsPassedMarker>>,
