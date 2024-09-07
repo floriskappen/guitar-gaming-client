@@ -1,5 +1,7 @@
 use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, prelude::*};
+use bevy_tween::prelude::*;
 use bevy_mod_billboard::plugin::BillboardPlugin;
+use components::song_note::SongNoteTriggeredEvent;
 use helpers::persistence::get_data_dir;
 use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource};
 use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin, song_play::plugin::SongPlayPlugin, song_select::plugin::SongSelectPlugin, tune::plugin::TunePlugin};
@@ -67,10 +69,12 @@ fn main() {
         }),
         ..Default::default()
     }));
+    app.add_plugins(DefaultTweenPlugins);
     app.add_plugins(FrameTimeDiagnosticsPlugin);
     app.add_plugins(LogDiagnosticsPlugin::default());
-
     app.add_plugins(BillboardPlugin);
+
+    app.add_event::<SongNoteTriggeredEvent>();
 
     let configuration_resource = ConfigurationResource::load_from_disk();
     if configuration_resource.device.is_some() && !configuration_resource.selected_device_channels.is_empty() {

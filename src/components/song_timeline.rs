@@ -64,7 +64,7 @@ pub fn spawn_song_timeline(
 }
 
 
-pub fn manage_song_timeline(
+pub fn update_song_timeline(
     mut commands: Commands,
     song_loaded: Res<SongLoadedResource>,
     song_notes_wrapper_query: Query<Entity, With<SongNotes>>,
@@ -88,7 +88,7 @@ pub fn manage_song_timeline(
             }
 
             let existing_song_note = song_notes_query.iter_mut().find(|(_, _, song_note)| {
-                song_note.note_event.identifier == note_event.identifier
+                song_note.note_event.equals(&note_event)
             });
 
             // If the note has already passed

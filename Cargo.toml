@@ -7,6 +7,7 @@ edition = "2021"
 aubio = { version = "0.2.1", features = ["bindgen", "builtin", "fftw3"] }
 bevy = "0.14.1"
 bevy_mod_billboard = "0.7.0"
+bevy_tween = "0.6.0"
 cpal = "0.15.3"
 directories = "5.0.1"
 pitch-detection = "0.3.0"

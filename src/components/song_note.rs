@@ -3,7 +3,10 @@ use bevy::{prelude::*, render::mesh::PlaneMeshBuilder};
 
 use crate::{constants::ingame::{FRET_CENTERS, STRING_CENTERS, STRING_COLORS}, helpers::song_notes::NoteEvent};
 
-#[derive(Component)]
+#[derive(Event)]
+pub struct SongNoteTriggeredEvent(pub SongNote);
+
+#[derive(Component, Debug, Clone)]
 pub struct SongNote {
     pub note_event: NoteEvent,
     pub triggered: bool,
@@ -126,4 +129,31 @@ pub fn spawn_song_note(
             });
         }
     });
+}
+
+pub fn update_song_note(
+    mut commands: Commands,
+    mut event_song_note_triggered: EventReader<SongNoteTriggeredEvent>,
+    mut song_notes_query: Query<(&mut SongNote, &Children)>,
+    mut pbr_query: Query<&mut Handle<StandardMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    for event in event_song_note_triggered.read() {
+        eprintln!("Song Note {:?} triggered!", event.0);
+        for (mut song_note, children) in song_notes_query.iter_mut() {
+            if song_note.note_event.equals(&event.0.note_event) {
+                for &child in children.iter() {
+                    if let Ok(material_handle) = pbr_query.get_mut(child) {
+                        // Get the current material and modify it
+                        if let Some(material) = materials.get_mut(&*material_handle) {
+                            // Update the base color or any other material property
+                            material.base_color = STRING_COLORS[song_note.note_event.string_index].with_luminance(0.3);
+                        }
+                    }
+                }
+                song_note.triggered = true;
+                break
+            }
+        }
+    }
 }
