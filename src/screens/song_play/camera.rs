@@ -10,6 +10,9 @@ pub fn spawn_camera(
     starting_position: Vec3,
 ) {
     builder.spawn((Camera3dBundle {
+        // projection: Projection::Perspective(PerspectiveProjection {
+        //     ..Default::default()
+        // }),
         projection: Projection::Orthographic(OrthographicProjection {
             scaling_mode: bevy::render::camera::ScalingMode::FixedHorizontal(19.0),
             ..Default::default()

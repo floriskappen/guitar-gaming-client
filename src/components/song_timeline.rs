@@ -103,7 +103,8 @@ pub fn update_song_timeline(
 
             let length = (note_event.duration_seconds * configuration.approach_rate)/2.0;
             let progress = (current_time + (TIMELINE_LENGTH / configuration.approach_rate) - (note_event.start_time_seconds + note_event.duration_seconds)) / (TIMELINE_LENGTH / configuration.approach_rate);
-            let new_position_x = -TIMELINE_LENGTH + progress * (length + TIMELINE_LENGTH) + 0.3;
+            
+            let new_position_x = -TIMELINE_LENGTH + progress * (length + TIMELINE_LENGTH);
             
             if let Some((_, mut transform, _)) = existing_song_note {
                 transform.translation.x = new_position_x;

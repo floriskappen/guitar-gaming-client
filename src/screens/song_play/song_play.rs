@@ -223,7 +223,7 @@ pub fn song_play_update(
         }
     }
 
-    if let Some(mut song_progress) = song_loaded.progress.clone() {
+    if let Some(song_progress) = song_loaded.progress.as_mut() {
         song_progress.timer.tick(time.delta());
         let elapsed_secs = song_progress.timer.elapsed_secs();
 
@@ -264,8 +264,6 @@ pub fn song_play_update(
                 *debug_onset_el = BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0));
             }
         }
-
-        song_loaded.progress = Some(song_progress);
     }
 
 

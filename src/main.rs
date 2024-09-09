@@ -1,6 +1,6 @@
 use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, prelude::*};
-use bevy_tween::prelude::*;
 use bevy_mod_billboard::plugin::BillboardPlugin;
+use bevy_tween::prelude::*;
 use components::song_note::SongNoteTriggeredEvent;
 use helpers::persistence::get_data_dir;
 use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource};
@@ -69,10 +69,10 @@ fn main() {
         }),
         ..Default::default()
     }));
-    app.add_plugins(DefaultTweenPlugins);
     app.add_plugins(FrameTimeDiagnosticsPlugin);
     app.add_plugins(LogDiagnosticsPlugin::default());
     app.add_plugins(BillboardPlugin);
+    app.add_plugins(DefaultTweenPlugins);
 
     app.add_event::<SongNoteTriggeredEvent>();
 
