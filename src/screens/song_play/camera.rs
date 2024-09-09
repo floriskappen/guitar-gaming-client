@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{components::song_note::SongNote, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT}};
+use crate::{constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT}, features::timeline::components::note::Note};
 
 #[derive(Component)]
 pub struct Camera3DMarker;
@@ -33,15 +33,15 @@ pub fn spawn_camera(
 pub fn camera_system(
     mut set: ParamSet<(
         Query<&mut Transform, With<Camera3DMarker>>,
-        Query<&SongNote, With<SongNote>>
+        Query<&Note, With<Note>>
     )>,
     time: Res<Time>,
 ) {
     let mut song_note_total_fret_index = 0;
     let mut song_note_amount = 0;
-    for song_note in set.p1().iter() {
+    for note in set.p1().iter() {
         song_note_amount += 1;
-        song_note_total_fret_index += song_note.note_event.fret_index;
+        song_note_total_fret_index += note.note_event.fret_index;
     }
     if song_note_amount > 0 {
         let song_note_average_fret_index = song_note_total_fret_index / song_note_amount;

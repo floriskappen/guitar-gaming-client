@@ -1,7 +1,7 @@
 use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, prelude::*};
 use bevy_mod_billboard::plugin::BillboardPlugin;
 use bevy_tween::prelude::*;
-use components::song_note::SongNoteTriggeredEvent;
+use features::timeline::components::note::NoteTriggeredEvent;
 use helpers::persistence::get_data_dir;
 use resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, input_devices::InputDevicesResource, song_library::SongLibraryResource, song_loaded::SongLoadedResource};
 use screens::{input_device_detail::plugin::InputDeviceDetailPlugin, input_device_overview::plugin::InputDeviceOverviewPlugin, song_play::plugin::SongPlayPlugin, song_select::plugin::SongSelectPlugin, tune::plugin::TunePlugin};
@@ -21,8 +21,14 @@ mod resources {
 mod components {
     pub mod button_primary;
     pub mod button_minimal;
-    pub mod song_note;
-    pub mod song_timeline;
+}
+mod features {
+    pub mod timeline {
+        pub mod timeline;
+        pub mod components {
+            pub mod note;
+        }
+    }
 }
 mod screens {
     pub mod input_device_overview {
@@ -56,7 +62,7 @@ mod helpers {
     pub mod input_device;
     pub mod tuning;
     pub mod persistence;
-    pub mod song_notes;
+    pub mod notes;
 }
 
 fn main() {
@@ -74,7 +80,7 @@ fn main() {
     app.add_plugins(BillboardPlugin);
     app.add_plugins(DefaultTweenPlugins);
 
-    app.add_event::<SongNoteTriggeredEvent>();
+    app.add_event::<NoteTriggeredEvent>();
 
     let configuration_resource = ConfigurationResource::load_from_disk();
     if configuration_resource.device.is_some() && !configuration_resource.selected_device_channels.is_empty() {

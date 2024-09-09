@@ -3,7 +3,7 @@ use std::{fs::File, io::BufReader};
 use bevy::prelude::*;
 use uuid::Uuid;
 
-use crate::helpers::{persistence::get_songs_dir, song_notes::NoteEvent};
+use crate::helpers::{persistence::get_songs_dir, notes::NoteEvent};
 
 use super::song_library::SongMetadata;
 
@@ -45,7 +45,7 @@ impl SongLoadedResource {
             NoteEvent {
                 start_time_seconds: 1.0,
                 duration_seconds: 1.0,
-                string_index: 0,
+                string_index: 3,
                 fret_index: 9,
             },
             NoteEvent {

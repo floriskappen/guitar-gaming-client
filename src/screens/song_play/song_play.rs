@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_note::{SongNote, SongNoteTriggeredEvent}, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_COLORS}, helpers::{input_device::AudioStream, persistence::get_songs_dir}, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, output_audio_song::{AudioCommand, OutputAudioControllerSong}, song_loaded::SongLoadedResource}, states::app_state::AppState};
+
+use crate::{components::button_minimal::spawn_button_minimal, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS}, features::timeline::{components::note::{Note, NoteTriggeredEvent}, timeline::spawn_timeline}, helpers::input_device::AudioStream, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, output_audio_song::{AudioCommand, OutputAudioControllerSong}, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::camera::spawn_camera;
 
@@ -51,7 +52,7 @@ pub fn song_play_load(
         });
 
         // Song timeline
-        spawn_song_timeline(builder, &mut meshes, &mut materials);
+        spawn_timeline(builder, &mut meshes, &mut materials);
     
         let font = asset_server.load("fonts/IBMPlexMono-Regular.ttf");
     
@@ -214,8 +215,8 @@ pub fn song_play_update(
     mut next_state: ResMut<NextState<AppState>>,
     mut song_loaded: ResMut<SongLoadedResource>,
     input_device: Res<InputDeviceResource>,
-    mut song_notes_query: Query<&SongNote>,
-    mut event_song_note_triggered: EventWriter<SongNoteTriggeredEvent>,
+    mut notes_query: Query<&Note>,
+    mut event_song_note_triggered: EventWriter<NoteTriggeredEvent>,
 ) {
     for interaction in back_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
@@ -238,14 +239,14 @@ pub fn song_play_update(
                     if has_onset {
                         song_progress.previous_onset_secs = elapsed_secs;
 
-                        for song_note in song_notes_query.iter_mut() {
-                            if song_note.triggered {
+                        for note in notes_query.iter_mut() {
+                            if note.triggered {
                                 continue
                             }
 
                             // If the timing is somewhat close (tweak later)
-                            if song_note.note_event.start_time_seconds > elapsed_secs - 0.2 && song_note.note_event.start_time_seconds < elapsed_secs + 0.2 {
-                                event_song_note_triggered.send(SongNoteTriggeredEvent(song_note.clone()));
+                            if note.note_event.start_time_seconds > elapsed_secs - 0.2 && note.note_event.start_time_seconds < elapsed_secs + 0.2 {
+                                event_song_note_triggered.send(NoteTriggeredEvent(note.clone()));
                             }
                         }
 

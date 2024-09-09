@@ -27,7 +27,7 @@ impl Default for ConfigurationResource {
         ConfigurationResource {
             device: None,
             selected_device_channels: vec![],
-            approach_rate: 7.0,
+            approach_rate: 11.0,
         }
     }
 }
