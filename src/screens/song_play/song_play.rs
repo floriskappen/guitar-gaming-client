@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use bevy_mod_billboard::{prelude::*, BillboardLockAxis};
 
-use crate::{components::{button_minimal::spawn_button_minimal, song_note::SongNote, song_timeline::spawn_song_timeline}, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS, STRING_COLORS}, helpers::{input_device::AudioStream, persistence::get_songs_dir}, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, output_audio_song::{AudioCommand, OutputAudioControllerSong}, song_loaded::SongLoadedResource}, states::app_state::AppState};
+
+use crate::{components::button_minimal::spawn_button_minimal, constants::ingame::{CAMERA_Y_RANGE, FRET_AMOUNT, FRET_CENTERS}, features::timeline::{components::note::{Note, NoteTriggeredEvent}, timeline::spawn_timeline}, helpers::input_device::AudioStream, resources::{configuration::ConfigurationResource, input_device::InputDeviceResource, output_audio_song::{AudioCommand, OutputAudioControllerSong}, song_loaded::SongLoadedResource}, states::app_state::AppState};
 
 use super::camera::spawn_camera;
 
@@ -51,7 +52,7 @@ pub fn song_play_load(
         });
 
         // Song timeline
-        spawn_song_timeline(builder, &mut meshes, &mut materials);
+        spawn_timeline(builder, &mut meshes, &mut materials);
     
         let font = asset_server.load("fonts/IBMPlexMono-Regular.ttf");
     
@@ -201,13 +202,9 @@ pub fn song_play_load(
                 ));
             });
         });
-    
 
     // Play the audio
-    let song_directory = get_songs_dir().unwrap().join(
-        format!("{}/audio.mp3", song_loaded.metadata.as_ref().unwrap().uuid)
-    );
-    let _ = output_audio_song.sender.send(AudioCommand::Play(song_directory.to_str().unwrap().to_string()));
+    let _ = output_audio_song.sender.send(AudioCommand::Play(song_loaded.audio_path.as_ref().unwrap().clone()));
 }
 
 pub fn song_play_update(
@@ -217,10 +214,9 @@ pub fn song_play_update(
     mut debug_onset_marker: Query<&mut BackgroundColor, With<DebugOnsetMarker>>,
     mut next_state: ResMut<NextState<AppState>>,
     mut song_loaded: ResMut<SongLoadedResource>,
-    mut pbr_query: Query<&mut Handle<StandardMaterial>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
     input_device: Res<InputDeviceResource>,
-    mut song_notes_query: Query<(&SongNote, &Children)>,
+    mut notes_query: Query<&Note>,
+    mut event_song_note_triggered: EventWriter<NoteTriggeredEvent>,
 ) {
     for interaction in back_button_query_interaction.iter() {
         if *interaction == Interaction::Pressed {
@@ -228,7 +224,7 @@ pub fn song_play_update(
         }
     }
 
-    if let Some(mut song_progress) = song_loaded.progress.clone() {
+    if let Some(song_progress) = song_loaded.progress.as_mut() {
         song_progress.timer.tick(time.delta());
         let elapsed_secs = song_progress.timer.elapsed_secs();
 
@@ -243,23 +239,14 @@ pub fn song_play_update(
                     if has_onset {
                         song_progress.previous_onset_secs = elapsed_secs;
 
-                        for (song_note, children) in song_notes_query.iter_mut() {
-                            if song_note.triggered {
+                        for note in notes_query.iter_mut() {
+                            if note.triggered {
                                 continue
                             }
 
                             // If the timing is somewhat close (tweak later)
-                            if song_note.note_event.start_time_seconds > elapsed_secs - 0.2 && song_note.note_event.start_time_seconds < elapsed_secs + 0.2 {
-                                for &child in children.iter() {
-                                    if let Ok(material_handle) = pbr_query.get_mut(child) {
-                                        // Get the current material and modify it
-                                        if let Some(material) = materials.get_mut(&*material_handle) {
-                                            // Update the base color or any other material property
-                                            material.base_color = STRING_COLORS[song_note.note_event.string_index].with_luminance(0.3);
-                                        }
-                                    }
-                                }
-                                break
+                            if note.note_event.start_time_seconds > elapsed_secs - 0.2 && note.note_event.start_time_seconds < elapsed_secs + 0.2 {
+                                event_song_note_triggered.send(NoteTriggeredEvent(note.clone()));
                             }
                         }
 
@@ -278,8 +265,6 @@ pub fn song_play_update(
                 *debug_onset_el = BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.0));
             }
         }
-
-        song_loaded.progress = Some(song_progress);
     }
 
 

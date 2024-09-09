@@ -8,7 +8,21 @@ pub struct NoteEvent {
     // pub pitch_midi: usize,
     pub string_index: usize,
     pub fret_index: usize,
-    pub identifier: Uuid
+}
+
+impl NoteEvent {
+    pub fn equals(&self, note_event: &NoteEvent) -> bool {
+        if 
+            note_event.start_time_seconds == self.start_time_seconds &&
+            note_event.duration_seconds == self.duration_seconds &&
+            note_event.string_index == self.string_index &&
+            note_event.fret_index == self.fret_index
+        {
+            return true
+        }
+
+        false
+    }
 }
 
 pub fn note_to_offset(note: &str) -> Option<usize> {

@@ -1,7 +1,9 @@
+use std::{fs::File, io::BufReader};
+
 use bevy::prelude::*;
 use uuid::Uuid;
 
-use crate::helpers::song_notes::NoteEvent;
+use crate::helpers::{persistence::get_songs_dir, notes::NoteEvent};
 
 use super::song_library::SongMetadata;
 
@@ -22,7 +24,7 @@ pub struct SongLoadedProgress {
 #[derive(Default)]
 pub struct SongLoadedResource {
     pub metadata: Option<SongMetadata>,
-    // pub audio: // TODO,
+    pub audio_path: Option<String>,
     pub notes: Option<Vec<NoteEvent>>,
     pub progress: Option<SongLoadedProgress>,
 }
@@ -32,79 +34,103 @@ impl SongLoadedResource {
     pub fn load_song(&mut self, song_metadata: SongMetadata) {
         self.metadata = Some(song_metadata.clone());
 
-        // TODO: load audio file
+        // Set the audio filepath
+        let song_directory = get_songs_dir().unwrap().join(
+            format!("{}/audio.mp3", song_metadata.uuid)
+        );
+        self.audio_path = Some(song_directory.to_str().unwrap().to_string());
 
         // TODO: properly load notes
         let mut note_events = vec![
             NoteEvent {
-                start_time_seconds: 4.0,
+                start_time_seconds: 1.0,
                 duration_seconds: 1.0,
-                string_index: 0,
+                string_index: 3,
                 fret_index: 9,
-                identifier: Uuid::new_v4(),
             },
             NoteEvent {
-                start_time_seconds: 4.5,
+                start_time_seconds: 2.0,
                 duration_seconds: 1.0,
                 string_index: 1,
                 fret_index: 10,
-                identifier: Uuid::new_v4(),
+            },
+            NoteEvent {
+                start_time_seconds: 3.0,
+                duration_seconds: 1.0,
+                string_index: 2,
+                fret_index: 11,
+            },
+            NoteEvent {
+                start_time_seconds: 4.0,
+                duration_seconds: 1.0,
+                string_index: 3,
+                fret_index: 9,
             },
             NoteEvent {
                 start_time_seconds: 5.0,
                 duration_seconds: 1.0,
-                string_index: 2,
-                fret_index: 11,
-                identifier: Uuid::new_v4(),
-            },
-            NoteEvent {
-                start_time_seconds: 5.5,
-                duration_seconds: 1.0,
-                string_index: 3,
-                fret_index: 9,
-                identifier: Uuid::new_v4(),
+                string_index: 4,
+                fret_index: 10,
             },
             NoteEvent {
                 start_time_seconds: 6.0,
                 duration_seconds: 1.0,
+                string_index: 5,
+                fret_index: 11,
+            },
+            NoteEvent {
+                start_time_seconds: 7.0,
+                duration_seconds: 1.0,
+                string_index: 5,
+                fret_index: 11,
+            },
+            NoteEvent {
+                start_time_seconds: 8.0,
+                duration_seconds: 1.0,
+                string_index: 5,
+                fret_index: 11,
+            },
+            NoteEvent {
+                start_time_seconds: 9.0,
+                duration_seconds: 1.0,
+                string_index: 5,
+                fret_index: 11,
+            },
+            NoteEvent {
+                start_time_seconds: 10.0,
+                duration_seconds: 1.0,
+                string_index: 5,
+                fret_index: 11,
+            },
+            NoteEvent {
+                start_time_seconds: 11.0,
+                duration_seconds: 1.0,
                 string_index: 4,
-                fret_index: 10,
-                identifier: Uuid::new_v4(),
+                fret_index: 11,
             },
             NoteEvent {
-                start_time_seconds: 6.5,
+                start_time_seconds: 12.0,
                 duration_seconds: 1.0,
-                string_index: 5,
-                fret_index: 11,
-                identifier: Uuid::new_v4(),
+                string_index: 4,
+                fret_index: 8,
             },
             NoteEvent {
-                start_time_seconds: 7.5,
+                start_time_seconds: 13.0,
                 duration_seconds: 1.0,
-                string_index: 5,
-                fret_index: 11,
-                identifier: Uuid::new_v4(),
+                string_index: 2,
+                fret_index: 8,
             },
             NoteEvent {
-                start_time_seconds: 8.5,
+                start_time_seconds: 14.0,
                 duration_seconds: 1.0,
-                string_index: 5,
-                fret_index: 11,
-                identifier: Uuid::new_v4(),
+                string_index: 2,
+                fret_index: 8,
             },
             NoteEvent {
-                start_time_seconds: 9.5,
+                start_time_seconds: 15.0,
                 duration_seconds: 1.0,
-                string_index: 5,
-                fret_index: 11,
-                identifier: Uuid::new_v4(),
-            },
-            NoteEvent {
-                start_time_seconds: 10.5,
-                duration_seconds: 1.0,
-                string_index: 5,
-                fret_index: 11,
-                identifier: Uuid::new_v4(),
+                string_index: 2,
+                fret_index: 8,
             },
         ];
 
