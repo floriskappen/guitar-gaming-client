@@ -1,2 +1,7 @@
-# guitar gaming
-guitar gaming is a free-to-win rhythm game that you play with a real guitar. whether you are just beginning to learn to play the instrument or are a more experienced player looking to set some scores and learn some new songs, there should be something for you because of our community driven song-mapping system.
+# Tauri + React + Typescript
+
+This template should help get you started developing with Tauri, React and Typescript in Vite.
+
+## Recommended IDE Setup
+
+- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
