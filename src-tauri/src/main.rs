@@ -2,12 +2,16 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod helpers {
-    mod input_device;
-    mod notes;
-    mod persistence;
-    mod tuning;
+    pub mod configuration;
+    pub mod input_device;
+    pub mod notes;
+    pub mod persistence;
+    pub mod tuning;
 }
 mod state {
+    pub mod configuration;
+}
+mod commands {
     pub mod configuration;
 }
 
