@@ -13,8 +13,9 @@
     "windows": [
       {
         "title": "guitar-gaming-client",
-        "width": 800,
-        "height": 600
+        "width": 1200,
+        "height": 900,
+        "fullscreen": true
       }
     ],
     "security": {

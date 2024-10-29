@@ -9,7 +9,14 @@ export const createAppRouter = () => {
                 const { IndexRoute } = await import("./routes/index");
                 return { Component: IndexRoute }
             }
-        }
+        },
+        {
+            path: "/song-select",
+            lazy: async () => {
+                const { SongSelectRoute } = await import("./routes/song-select");
+                return { Component: SongSelectRoute }
+            }
+        },
     ])
 }
 

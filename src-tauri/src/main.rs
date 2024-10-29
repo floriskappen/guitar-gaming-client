@@ -6,6 +6,7 @@ mod helpers {
     pub mod input_device;
     pub mod notes;
     pub mod persistence;
+    pub mod song_library;
     pub mod tuning;
 }
 mod state {
@@ -13,6 +14,8 @@ mod state {
 }
 mod commands {
     pub mod configuration;
+    pub mod input_devices;
+    pub mod song_library;
 }
 
 fn main() {
