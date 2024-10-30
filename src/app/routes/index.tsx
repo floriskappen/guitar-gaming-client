@@ -24,6 +24,8 @@ export const IndexRoute = () => {
                     // The device that the user has configured can indeed be found
                     // This means we can go to the song selection route
                     navigate('/song-select')
+                } else {
+                    navigate('/input-device-select')
                 }
             }
         }

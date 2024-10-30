@@ -17,6 +17,13 @@ export const createAppRouter = () => {
                 return { Component: SongSelectRoute }
             }
         },
+        {
+            path: "/input-device-select",
+            lazy: async () => {
+                const { InputDeviceSelectRoute } = await import("./routes/input-device-select");
+                return { Component: InputDeviceSelectRoute }
+            }
+        },
     ])
 }
 
