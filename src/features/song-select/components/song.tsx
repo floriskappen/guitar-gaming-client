@@ -5,6 +5,7 @@ import { useRef } from "react"
 import { BsThreeDots } from "react-icons/bs"
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { FaListUl } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 export type SongProps = {
     metadata: SongMetadata
@@ -12,6 +13,8 @@ export type SongProps = {
 
 export const Song = ({ metadata }: SongProps) => {
     const trigger = useRef<HTMLDivElement>(null)
+
+    const navigate = useNavigate()
 
     function manuallyOpenContextMenu(target: HTMLElement) {
         trigger?.current?.dispatchEvent(
@@ -26,9 +29,11 @@ export const Song = ({ metadata }: SongProps) => {
     return (
         <ContextMenu>
             <ContextMenuTrigger ref={trigger}>
-                <Button variant="outline" className="h-12 w-full p-0 items-center flex mt-2">
+                <Button variant="outline" className="h-12 w-full p-0 items-center flex mt-2" onClick={() => {
+                    navigate(`/song-play/${metadata.uuid}`)
+                }}>
                     <div className="bg-neutral-700 w-6 h-full shrink-0"></div>
-                    <p className="w-full">{metadata.artists.join(", ")} - {metadata.title}</p>
+                    <p className="px-4 w-full text-start">{metadata.artists.join(", ")} - {metadata.title}</p>
                     <div onClick={(event) => {
                         event.preventDefault()
                         event.stopPropagation()

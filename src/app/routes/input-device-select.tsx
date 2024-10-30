@@ -3,11 +3,14 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState } from "react"
 import { MdChevronRight } from "react-icons/md"
+import { useNavigate } from "react-router-dom"
 import { twMerge } from "tailwind-merge"
 
 export const InputDeviceSelectRoute = () => {
     const [inputDevice, setInputDevice] = useState<string | null>(null)
     const [channels, setChannels] = useState<boolean[]>([true, true])
+
+    const navigate = useNavigate()
 
     const canContinue = !!inputDevice && !!channels.find((v) => v === true)
 
@@ -17,7 +20,9 @@ export const InputDeviceSelectRoute = () => {
             <TooltipProvider>
                 <Tooltip delayDuration={200}>
                     <TooltipTrigger>
-                    <Button variant="outline dashed" aria-label="test" disabled={!canContinue} onClick={() => {}}>
+                    <Button variant="outline" aria-label="test" disabled={!canContinue} onClick={() => {
+                        navigate('/song-select')
+                    }}>
                         continue
                         <MdChevronRight className="w-4 h-4" />
                     </Button>
