@@ -6,10 +6,13 @@ import { getSongLibrary } from "../internal-api/get-song-library"
 import { BiLoaderAlt } from "react-icons/bi";
 import { useAtom } from "jotai"
 import { songLibraryAtom } from "../atoms/song-select"
+import { useNavigate } from "react-router-dom";
 
 export const SongSelect = () => {
     const [loading, setLoading] = useState(true)
     const [songLibrary, setSongLibrary] = useAtom(songLibraryAtom)
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         getSongLibrary(false).then((data) => {
@@ -22,7 +25,9 @@ export const SongSelect = () => {
         <div className="w-[600px]">
             <div className="w-full items-center flex justify-between">
                 <p>select a song</p>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => {
+                    navigate("/song-edit/new/select-audio")
+                }}>
                     map new song +
                 </Button>
             </div>
