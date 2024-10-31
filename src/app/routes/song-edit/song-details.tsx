@@ -2,10 +2,12 @@ import { Sidebar } from "@/features/song-edit/components/sidebar"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { useParams } from "react-router-dom"
 import { Menubar } from "@/features/song-edit/components/menubar"
+import { SongDetailsForm } from "@/features/song-edit/components/details-form"
 
-export const SongEditMapDetailsRoute = () => {
+
+export const SongEditSongDetailsRoute = () => {
     let { uuid } = useParams()
-
+    
     return (
         <div className="flex">
             <SidebarProvider>
@@ -19,12 +21,11 @@ export const SongEditMapDetailsRoute = () => {
                     </div>
                     <div className="mt-4">
                         <div className="w-full px-8 ml-6">
-                            <p>song edit - map details: {uuid}</p>
+                            <SongDetailsForm />
                         </div>
                     </div>
                 </div>
             </SidebarProvider>
-            
         </div>
     )
 }

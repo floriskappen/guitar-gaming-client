@@ -25,13 +25,6 @@ export const createAppRouter = () => {
             }
         },
         {
-            path: "/song-edit/:uuid/select-audio",
-            lazy: async () => {
-                const { SongEditSelectAudioRoute } = await import("./routes/song-edit/select-audio");
-                return { Component: SongEditSelectAudioRoute }
-            }
-        },
-        {
             path: "/song-edit/:uuid/midi-editor",
             lazy: async () => {
                 const { SongEditMidiEditorRoute } = await import("./routes/song-edit/midi-editor");
@@ -41,8 +34,8 @@ export const createAppRouter = () => {
         {
             path: "/song-edit/:uuid/details",
             lazy: async () => {
-                const { SongEditMapDetailsRoute } = await import("./routes/song-edit/map-details");
-                return { Component: SongEditMapDetailsRoute }
+                const { SongEditSongDetailsRoute } = await import("./routes/song-edit/song-details");
+                return { Component: SongEditSongDetailsRoute }
             }
         },
         {
