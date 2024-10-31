@@ -1,7 +1,7 @@
-import { SongEditSidebar } from "@/app/components/song-edit-sidebar"
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/ui/menubar"
+import { Sidebar } from "@/features/song-edit/components/sidebar"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { useParams } from "react-router-dom"
+import { Menubar } from "@/features/song-edit/components/menubar"
 
 export const SongEditMapDetailsRoute = () => {
     let { uuid } = useParams()
@@ -9,32 +9,17 @@ export const SongEditMapDetailsRoute = () => {
     return (
         <div className="flex">
             <SidebarProvider>
-                <SongEditSidebar />
+                <Sidebar />
 
-                <div className="w-screen h-screen bg-neutral-900 pr-10 pl-2 pt-2 pb-8">
-                    <div className="flex">
+                <div className="w-screen h-screen bg-neutral-900 pr-10 pt-2 pb-8">
+                    <div className="flex pl-2">
                         <SidebarTrigger className="mt-1" />
-                        <Menubar className="w-fit ml-6">
-                            <MenubarMenu>
-                                <MenubarTrigger>File</MenubarTrigger>
-                                <MenubarContent>
-                                    <MenubarItem>
-                                        New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-                                    </MenubarItem>
-                                    <MenubarItem>New Window</MenubarItem>
-                                    <MenubarSeparator />
-                                        <MenubarItem>Share</MenubarItem>
-                                    <MenubarSeparator />
-                                    <MenubarItem>Print</MenubarItem>
-                                </MenubarContent>
-                            </MenubarMenu>
-                        </Menubar>
+                        <Menubar />
 
                     </div>
-                    <div>
-
-                        <div className="w-full">
-                        <p>song edit - map details {uuid}</p>
+                    <div className="mt-4">
+                        <div className="w-full px-8 ml-6">
+                            <p>song edit - map details: {uuid}</p>
                         </div>
                     </div>
                 </div>

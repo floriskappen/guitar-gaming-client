@@ -16,7 +16,7 @@ export const SongEditSelectAudioRoute = () => {
                     back to song select
                 </Button>
                 <Button variant="outline" onClick={() => {
-                    navigate(`/song-edit/${uuid}/midi-editor`)
+                    navigate(`/song-edit/${uuid}/details`)
                 }}>
                     continue
                     <MdChevronRight className="w-4 h-4" />
