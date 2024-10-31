@@ -17,7 +17,7 @@ export const Sidebar = () => {
     // Menu items.
     const items = [
         {
-            title: "map details",
+            title: "song details",
             url: `/song-edit/${uuid}/details`,
             icon: FaList,
         },
