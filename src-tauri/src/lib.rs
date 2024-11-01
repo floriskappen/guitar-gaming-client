@@ -45,6 +45,7 @@ pub fn run() {
             commands::input_devices::commands::get_input_devices,
             commands::configuration::commands::get_configuration,
             commands::songs::commands::get_songs,
+            commands::songs::commands::create_song_empty,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
