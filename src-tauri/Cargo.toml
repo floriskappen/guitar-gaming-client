@@ -28,4 +28,5 @@ aubio = { version = "0.2.1", features = ["bindgen", "builtin", "fftw3"] }
 cpal = "0.15.3"
 pitch-detection = "0.3.0"
 uuid = "1.11.0"
+tauri-plugin-fs = "2"
 

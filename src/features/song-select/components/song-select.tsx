@@ -1,70 +1,72 @@
 import { Button } from "@/components/ui/button"
 import { Song } from "./song"
 import { useEffect, useState } from "react"
-import { getSongLibrary } from "../internal-api/get-song-library"
+import { getSongs } from "../internal-api/get-songs"
 
 import { BiLoaderAlt } from "react-icons/bi";
 import { useAtom, useSetAtom } from "jotai"
-import { songLibraryAtom } from "../atoms/song-select"
+import { songsAtom } from "@/features/song-select/atoms/song-select"
 import { useNavigate } from "react-router-dom";
 import { DrawerTrigger } from "@/components/ui/drawer";
 import { SelectAudio } from "@/features/song-edit/components/select-audio";
 import { audioFileAtom } from "@/features/song-edit/atoms/song-edit";
+import { createSong } from "@/features/song-select/functions/create-song";
 
 export const SongSelect = () => {
     const [loading, setLoading] = useState(true)
     const [selectAudioOpen, setSelectAudioOpen] = useState(false)
-    const [songLibrary, setSongLibrary] = useAtom(songLibraryAtom)
+    const [songs, setSongs] = useAtom(songsAtom)
 
     const navigate = useNavigate()
     const setAudioFile = useSetAtom(audioFileAtom)
 
     useEffect(() => {
-        getSongLibrary(false).then((data) => {
-            setSongLibrary(data)
+        getSongs(true).then((data) => {
+            setSongs(data)
             setLoading(false)
         })
     }, [])
 
     return (
         <div>
-            <SelectAudio onSelect={(file) => {
-                setAudioFile(file)
-                navigate("/song-edit/new/details")
-            }} open={selectAudioOpen} setOpen={setSelectAudioOpen}>
-                <div className="w-[600px]">
-                    <div className="w-full items-center flex justify-between">
-                        <p>select a song</p>
+            <div className="w-[600px]">
+                <div className="w-full items-center flex justify-between">
+                    <p>select a song</p>
+                    <SelectAudio onSelect={(file) => {
+                        setAudioFile(file)
+                        createSong(file)
+                        navigate("/song-edit/new/details")
+                    }} open={selectAudioOpen} setOpen={setSelectAudioOpen}>
                         <DrawerTrigger>
                             <Button variant="outline" onClick={() => setSelectAudioOpen(true)}>
                                 map new song +
                             </Button>
                         </DrawerTrigger>
-                    </div>
-
-                    <div className="mt-8">
-                        {
-                            loading ? (
-                                <div className="w-full flex justify-center py-4">
-                                    <BiLoaderAlt className="animate-spin" />
-                                </div>
-                            ) : null
-                        }
-
-                        {
-                            songLibrary?.songs?.map((songMetadata) => {
-                                return <Song key={songMetadata.uuid} metadata={songMetadata} />
-                            })
-                        }
-
-                        {
-                            !loading && !songLibrary?.songs ? (
-                                <p>no songs</p>
-                            ) : null
-                        }
-                    </div>
+                    </SelectAudio>
                 </div>
-            </SelectAudio>
+
+                <div className="mt-8">
+                    {
+                        loading ? (
+                            <div className="w-full flex justify-center py-4">
+                                <BiLoaderAlt className="animate-spin" />
+                            </div>
+                        ) : null
+                    }
+
+                    {
+                        songs?.map((song) => {
+                            return <Song key={song.uuid} metadata={song} />
+                        })
+                    }
+
+                    {
+                        !loading && !songs?.length ? (
+                            <p className="w-full text-center">no songs (yet!)</p>
+                        ) : null
+                    }
+                </div>
+            </div>
         </div>
     )
 }

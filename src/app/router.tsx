@@ -39,6 +39,13 @@ export const createAppRouter = () => {
             }
         },
         {
+            path: "/song-edit/:uuid/timing-editor",
+            lazy: async () => {
+                const { SongEditTimingEditor } = await import("./routes/song-edit/timing-editor");
+                return { Component: SongEditTimingEditor }
+            }
+        },
+        {
             path: "/song-play/:uuid",
             lazy: async () => {
                 const { SongPlayRoute } = await import("./routes/song-play");

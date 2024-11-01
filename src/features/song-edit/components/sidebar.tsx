@@ -11,7 +11,7 @@ import { twMerge } from "tailwind-merge";
 export const Sidebar = () => {
     const { uuid } = useParams()
     const { pathname } = useLocation()
-    const songEdit = useAtomValue(songEditAtom)
+    const song = useAtomValue(songEditAtom)
     const navigate = useNavigate()
 
     // Menu items.
@@ -25,19 +25,19 @@ export const Sidebar = () => {
             title: "timing editor",
             url: `/song-edit/${uuid}/timing-editor`,
             icon: TbMetronome,
-            disabled: !songEdit
+            disabled: !song?.title
         },
         {
             title: "midi editor",
             url: `/song-edit/${uuid}/midi-editor`,
             icon: MdOutlinePiano,
-            disabled: !songEdit
+            disabled: !song?.title
         },
         {
             title: "game view",
             url: `/song-edit/${uuid}/game-view`,
             icon: FaGuitar,
-            disabled: !songEdit
+            disabled: !song?.title
         },
     ]
 

@@ -1,13 +1,15 @@
-use std::{fs::{self, File}, io::Read};
+use std::{
+    fs::{self, File},
+    io::Read,
+    path::PathBuf,
+};
 
 use serde::{Deserialize, Serialize};
-
-use super::persistence::{get_data_dir, get_songs_dir};
 
 const FILENAME: &str = "song_library.json";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct SongMetadata {
+pub struct Song {
     pub uuid: String,
     pub title: String,
     pub artists: Vec<String>,
@@ -15,22 +17,14 @@ pub struct SongMetadata {
     pub duration_seconds: f32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SongLibrary {
-    pub songs: Vec<SongMetadata>
-}
-impl Default for SongLibrary {
-    fn default() -> Self {
-        Self { songs: get_song_metadata_list().unwrap() }
-    }
-}
-
-fn get_song_metadata_list() -> Result<Vec<SongMetadata>, Box<dyn std::error::Error>> {
-    let songs_dir = get_songs_dir().unwrap();
-    let mut song_metadata_list: Vec<SongMetadata> = vec![];
+fn get_songs_from_disk(
+    app_data_directory: PathBuf,
+) -> Result<Vec<Song>, Box<dyn std::error::Error>> {
+    let songs_directory = app_data_directory.join("songs");
+    let mut songs: Vec<Song> = vec![];
 
     // Iterate over the entries in the base directory
-    for entry in fs::read_dir(songs_dir)? {
+    for entry in fs::read_dir(songs_directory)? {
         let entry = entry?;
         let path = entry.path();
 
@@ -48,41 +42,41 @@ fn get_song_metadata_list() -> Result<Vec<SongMetadata>, Box<dyn std::error::Err
 
             // Check if the "metadata.json" file exists
             if metadata_path.exists() && metadata_path.is_file() {
-
                 let mut file = File::open(metadata_path).expect("Failed to open file");
                 let mut contents = String::new();
-                file.read_to_string(&mut contents).expect("Failed to read file");
-        
+                file.read_to_string(&mut contents)
+                    .expect("Failed to read file");
+
                 // Deserialize the JSON contents into the serializable struct
-                let song_metadata: SongMetadata =
+                let song: Song =
                     serde_json::from_str(&contents).expect("Failed to deserialize JSON");
 
                 // Add the deserialized metadata to the vector
-                song_metadata_list.push(song_metadata);
+                songs.push(song);
             }
         }
     }
 
-    Ok(song_metadata_list)
+    Ok(songs)
 }
 
-pub fn load_from_disk(refresh: bool) -> SongLibrary {
-    let directory = get_data_dir().unwrap();
-    let filepath = directory.join(FILENAME);
+pub fn get_songs(app_data_directory: PathBuf, use_cache: bool) -> Vec<Song> {
+    let songs_directory = app_data_directory.join("songs");
+    let filepath = songs_directory.join(FILENAME);
 
-    if filepath.exists() && !refresh {
+    if filepath.exists() && use_cache {
         // Open the file and read its contents
         let mut file = File::open(filepath).expect("Failed to open file");
         let mut contents = String::new();
-        file.read_to_string(&mut contents).expect("Failed to read file");
+        file.read_to_string(&mut contents)
+            .expect("Failed to read file");
 
         // Deserialize the JSON contents into the serializable struct
-        let serializable_configuration: SongLibrary =
+        let serializable_configuration: Vec<Song> =
             serde_json::from_str(&contents).expect("Failed to deserialize JSON");
         println!("{:?}", serializable_configuration);
-        return serializable_configuration
+        return serializable_configuration;
     }
 
-    SongLibrary::default()
+    return get_songs_from_disk(app_data_directory).unwrap()
 }
-

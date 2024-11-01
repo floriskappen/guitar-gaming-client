@@ -1,9 +1,15 @@
-use std::{error::Error, sync::{Arc, Mutex}};
+use std::{
+    error::Error,
+    sync::{Arc, Mutex},
+};
 
 use aubio::{Onset, OnsetMode};
-use cpal::{traits::{DeviceTrait, StreamTrait}, BufferSize, Device, SampleRate, StreamConfig};
-use pitch_detection::detector::PitchDetector;
+use cpal::{
+    traits::{DeviceTrait, StreamTrait},
+    BufferSize, Device, SampleRate, StreamConfig,
+};
 use pitch_detection::detector::autocorrelation::AutocorrelationDetector;
+use pitch_detection::detector::PitchDetector;
 
 const POWER_THRESHOLD: f32 = 0.15;
 const CLARITY_THRESHOLD: f32 = 0.6;
@@ -26,7 +32,12 @@ impl AudioStream {
         let channels = config.channels();
         let sample_rate = config.sample_rate();
 
-        println!("sample rate: {} buffer size: {} duration seconds: {}", sample_rate.0, buffer_size, buffer_size as f32 / sample_rate.0 as f32);
+        println!(
+            "sample rate: {} buffer size: {} duration seconds: {}",
+            sample_rate.0,
+            buffer_size,
+            buffer_size as f32 / sample_rate.0 as f32
+        );
 
         let buffer = Arc::new(Mutex::new(Vec::with_capacity(buffer_size)));
         let buffer_clone = Arc::clone(&buffer);
@@ -41,7 +52,8 @@ impl AudioStream {
             move |data: &[f32], _: &cpal::InputCallbackInfo| {
                 let mut buffer = buffer_clone.lock().unwrap();
 
-                if target_channels_clone.len() == channels as usize { // If all channels are selected, just take all data
+                if target_channels_clone.len() == channels as usize {
+                    // If all channels are selected, just take all data
                     buffer.extend(data.iter().take(data.len() / channels as usize));
                 } else {
                     for frame in data.chunks(channels as usize) {
@@ -84,7 +96,10 @@ impl AudioStream {
             .iter()
             .enumerate()
             .map(|(i, &x)| {
-                let window_value = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / (samples.len() - 1) as f32).cos());
+                let window_value = 0.5
+                    * (1.0
+                        - (2.0 * std::f32::consts::PI * i as f32 / (samples.len() - 1) as f32)
+                            .cos());
                 x * window_value
             })
             .collect();
@@ -92,7 +107,7 @@ impl AudioStream {
         // Calculate weighted RMS
         let sum: f32 = windowed_samples.iter().map(|&x| x * x).sum();
         let mean = sum / windowed_samples.len() as f32;
-         // Scale amplitude to a 0-100 range
+        // Scale amplitude to a 0-100 range
 
         mean.sqrt() * 100.0
     }
@@ -100,14 +115,19 @@ impl AudioStream {
     pub fn get_pitch(&self) -> Option<f32> {
         let signal = self.buffer.lock().unwrap().clone();
         if signal.len() < self.buffer_size {
-            return None
+            return None;
         }
 
         let padding: usize = self.buffer_size / 2;
 
         let mut detector = AutocorrelationDetector::new(self.buffer_size, padding);
-        if let Some(pitch) = detector.get_pitch(&signal, self.sample_rate.0 as usize, POWER_THRESHOLD, CLARITY_THRESHOLD) {
-            return Some(pitch.frequency)
+        if let Some(pitch) = detector.get_pitch(
+            &signal,
+            self.sample_rate.0 as usize,
+            POWER_THRESHOLD,
+            CLARITY_THRESHOLD,
+        ) {
+            return Some(pitch.frequency);
         }
 
         None
@@ -116,11 +136,15 @@ impl AudioStream {
     pub fn get_onset(&self) -> Result<bool, Box<dyn Error>> {
         let hop_size = self.buffer_size / 2;
 
-        let mut onset = Onset::new(OnsetMode::SpecFlux, self.buffer_size, hop_size, self.sample_rate.0)?;
+        let mut onset = Onset::new(
+            OnsetMode::SpecFlux,
+            self.buffer_size,
+            hop_size,
+            self.sample_rate.0,
+        )?;
         onset.set_threshold(4.0);
         onset.set_silence(-30.0);
 
-        
         let signal = self.buffer.lock().unwrap().clone();
 
         let mut onset_times: Vec<f32> = vec![];
@@ -131,7 +155,7 @@ impl AudioStream {
                 let onset_time = onset.get_last_ms();
                 if !onset_times.contains(&onset_time) {
                     onset_times.push(onset_time);
-                    return Ok(true)
+                    return Ok(true);
                 }
             }
         }

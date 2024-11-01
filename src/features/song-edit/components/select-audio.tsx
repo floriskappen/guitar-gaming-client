@@ -37,22 +37,21 @@ export const SelectAudio = ({ children, onSelect, open, setOpen }: { children: R
                     <DrawerTitle className="w-full text-center">
                         select an audio file
                     </DrawerTitle>
-                    <DrawerDescription>
-                        <div className="w-full flex items-center justify-center px-4 py-4">
-                            <div {...getRootProps({ className: 'dropzone' })} className={twMerge(
-                                "w-[600px] border-4 border-dashed flex justify-center px-4 py-8",
-                                isDragActive ? "border-neutral-100" : "border-neutral-600"
-                            )}>
-                                <input {...getInputProps()} />
-                                <p>drop an mp3 file, or click here to browse</p>
-                            </div>
-                        </div>
 
-                        <p className={twMerge(
-                            "w-full text-center text-red-600",
-                            wrongFile ? "visible" : "invisible"
-                        )}>please only select a single mp3 file</p>
-                    </DrawerDescription>
+                    <div className="w-full flex items-center justify-center px-4 py-4">
+                        <div {...getRootProps({ className: 'dropzone' })} className={twMerge(
+                            "w-[600px] border-4 border-dashed flex justify-center px-4 py-8",
+                            isDragActive ? "border-neutral-100" : "border-neutral-600"
+                        )}>
+                            <input {...getInputProps()} />
+                            <p>drop an mp3 file, or click here to browse</p>
+                        </div>
+                    </div>
+
+                    <p className={twMerge(
+                        "w-full text-center text-red-600",
+                        wrongFile ? "visible" : "invisible"
+                    )}>please only select a single mp3 file</p>
                 </DrawerHeader>
             </DrawerContent>
         </Drawer>

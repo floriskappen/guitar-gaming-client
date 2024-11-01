@@ -27,6 +27,8 @@ export const IndexRoute = () => {
                 } else {
                     navigate('/input-device-select')
                 }
+            } else {
+                navigate('/input-device-select')
             }
         }
 

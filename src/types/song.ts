@@ -1,7 +1,9 @@
 
 export type Song = {
-    audio: File
-    title: string
-    artists: string[]
     uuid: string
+    title: string | null
+    artists: string[]
+    tuning: string[]
+    duration_seconds: number | null
+    audio: File | null
 }

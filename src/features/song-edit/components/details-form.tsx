@@ -33,10 +33,10 @@ const formSchema = z.object({
 
 export const SongDetailsForm = () => {
     const [audioFile, setAudioFile] = useAtom(audioFileAtom)
-    const [songEdit, setSongEdit] = useAtom(songEditAtom)
+    const [song, setSong] = useAtom(songEditAtom)
     const [selectAudioOpen, setSelectAudioOpen] = useState(false)
     const [currentArtistInputValue, setCurrentArtistInputValue] = useState<string>("")
-    const [artists, setArtists] = useState<string[]>(songEdit?.artists || [])
+    const [artists, setArtists] = useState<string[]>(song?.artists || [])
 
     let { uuid } = useParams()
 
@@ -45,19 +45,21 @@ export const SongDetailsForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: songEdit?.title || "",
-            artists: songEdit?.artists || []
+            title: song?.title || "",
+            artists: song?.artists || []
         },
     })
     const { setValue } = form;
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         if (audioFile && uuid) {
-            setSongEdit({
+            setSong({
                 audio: audioFile,
                 artists: values.artists,
                 title: values.title,
-                uuid
+                uuid,
+                duration_seconds: null,
+                tuning: []
             })
             navigate(`/song-edit/${uuid}/midi-editor`)
         }
@@ -100,7 +102,7 @@ export const SongDetailsForm = () => {
                                     <div className="flex space-x-2 mb-1">
                                         {
                                             artists.map((artist) => {
-                                                return <div className="px-4 py-1 border-4 border-neutral-700 flex items-center text-xs">
+                                                return <div key={artist} className="px-4 py-1 border-4 border-neutral-700 flex items-center text-xs">
                                                     <p>{artist}</p>
                                                     <div className="ml-3 -mr-1 py-1 cursor-pointer" onClick={() => {
                                                         const newArtists = artists.filter((currentArtist) => currentArtist !== artist)

@@ -1,4 +1,6 @@
-pub const NOTE_STRINGS: [&str; 12] = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+pub const NOTE_STRINGS: [&str; 12] = [
+    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+];
 
 pub fn note_from_pitch(frequency: f32) -> i32 {
     let note_num = 12.0 * (frequency / 440.0).log2();

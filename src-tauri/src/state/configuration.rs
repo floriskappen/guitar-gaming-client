@@ -5,12 +5,11 @@ use serde::Serialize;
 pub struct ConfigurationState {
     pub device: Option<String>,
     pub selected_device_channels: Vec<u16>,
-    pub approach_rate: f32 // Meters/units per second
+    pub approach_rate: f32, // Meters/units per second
 }
 
 impl Default for ConfigurationState {
     fn default() -> Self {
-
         ConfigurationState {
             device: None,
             selected_device_channels: vec![],

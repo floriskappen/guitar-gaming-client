@@ -1,6 +1,6 @@
-import { SongLibrary } from '@/features/song-select/types/song-library';
+import { Song } from '@/types/song';
 import { atom, PrimitiveAtom } from 'jotai'
 
-export const songLibraryAtom = atom<SongLibrary | null>(
+export const songsAtom = atom<Song[] | null>(
     null
-) as PrimitiveAtom<SongLibrary | null>;
+) as PrimitiveAtom<Song[] | null>;

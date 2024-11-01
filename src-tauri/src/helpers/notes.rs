@@ -12,13 +12,12 @@ pub struct NoteEvent {
 
 impl NoteEvent {
     pub fn equals(&self, note_event: &NoteEvent) -> bool {
-        if 
-            note_event.start_time_seconds == self.start_time_seconds &&
-            note_event.duration_seconds == self.duration_seconds &&
-            note_event.string_index == self.string_index &&
-            note_event.fret_index == self.fret_index
+        if note_event.start_time_seconds == self.start_time_seconds
+            && note_event.duration_seconds == self.duration_seconds
+            && note_event.string_index == self.string_index
+            && note_event.fret_index == self.fret_index
         {
-            return true
+            return true;
         }
 
         false
@@ -27,18 +26,18 @@ impl NoteEvent {
 
 pub fn note_to_offset(note: &str) -> Option<usize> {
     match note {
-        "C"  => Some(0),
+        "C" => Some(0),
         "Db" => Some(1),
-        "D"  => Some(2),
+        "D" => Some(2),
         "Eb" => Some(3),
-        "E"  => Some(4),
-        "F"  => Some(5),
+        "E" => Some(4),
+        "F" => Some(5),
         "Gb" => Some(6),
-        "G"  => Some(7),
+        "G" => Some(7),
         "Ab" => Some(8),
-        "A"  => Some(9),
+        "A" => Some(9),
         "Bb" => Some(10),
-        "B"  => Some(11),
+        "B" => Some(11),
         _ => None,
     }
 }
@@ -53,7 +52,7 @@ pub fn note_with_octave_string_to_midi_pitch(note: &str) -> Option<usize> {
 
         if let Ok(octave) = octave_str.parse::<usize>() {
             if let Some(note_offset) = note_to_offset(note) {
-                return Some((octave + 1) * 12 + note_offset)
+                return Some((octave + 1) * 12 + note_offset);
             }
         }
     }
