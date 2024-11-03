@@ -96,10 +96,10 @@ export const Song = ({ song }: SongProps) => {
                     <p>edit</p>
                     <FaPencilAlt className="w-3 h-3 text-neutral-300" />
                 </ContextMenuItem>
-                <ContextMenuItem className="flex w-full items-center justify-between">
+                {/* <ContextMenuItem className="flex w-full items-center justify-between">
                     <p>add to collection</p>
                     <FaListUl className="w-3 h-3 text-neutral-300" />
-                </ContextMenuItem>
+                </ContextMenuItem> */}
                 <ContextMenuItem className="flex w-full items-center justify-between" onClick={() => setDeleteSongAlertOpen(true)}>
                     <p>delete</p>
                     <FaTrashAlt className="w-3 h-3 text-neutral-300" />

@@ -3,19 +3,10 @@ use std::{
     io::Read,
     path::PathBuf,
 };
-
-use serde::{Deserialize, Serialize};
+use super::structs::Song;
 
 const FILENAME: &str = "song_library.json";
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Song {
-    pub uuid: String,
-    pub title: Option<String>,
-    pub artists: Option<Vec<String>>,
-    pub tuning: Option<[String; 6]>,
-    pub duration_seconds: Option<f32>,
-}
 
 fn get_songs_from_disk(
     app_data_directory: PathBuf,

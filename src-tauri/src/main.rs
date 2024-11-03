@@ -17,6 +17,7 @@ pub mod commands {
     pub mod songs {
         pub mod commands;
         pub mod helpers;
+        pub mod structs;
     }
 }
 pub mod state {

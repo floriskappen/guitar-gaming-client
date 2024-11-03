@@ -3,7 +3,9 @@ use std::{fs::{self, File}, io::Write};
 use uuid::Uuid;
 use tauri::{AppHandle, Manager};
 
-use crate::commands::songs::helpers::{get_songs as get_songs_helper, Song};
+use crate::commands::songs::helpers::get_songs as get_songs_helper;
+use super::structs::Song;
+
 
 #[tauri::command]
 pub fn get_songs(app_handle: AppHandle, use_cache: bool) -> Vec<Song> {
