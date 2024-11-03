@@ -11,10 +11,10 @@ const FILENAME: &str = "song_library.json";
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Song {
     pub uuid: String,
-    pub title: String,
-    pub artists: Vec<String>,
-    pub tuning: [String; 6],
-    pub duration_seconds: f32,
+    pub title: Option<String>,
+    pub artists: Option<Vec<String>>,
+    pub tuning: Option<[String; 6]>,
+    pub duration_seconds: Option<f32>,
 }
 
 fn get_songs_from_disk(
@@ -62,6 +62,7 @@ fn get_songs_from_disk(
 
 pub fn get_songs(app_data_directory: PathBuf, use_cache: bool) -> Vec<Song> {
     let songs_directory = app_data_directory.join("songs");
+    println!("reading songs from {}", songs_directory.to_string_lossy());
     let filepath = songs_directory.join(FILENAME);
 
     if filepath.exists() && use_cache {

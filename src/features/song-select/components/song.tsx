@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu"
-import { SongMetadata } from "@/features/song-select/types/song-library";
+import { Song as SongType } from "@/types/song";
 import { useRef } from "react"
 import { BsThreeDots } from "react-icons/bs"
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
@@ -8,10 +8,10 @@ import { FaListUl } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 export type SongProps = {
-    metadata: SongMetadata
+    song: SongType
 }
 
-export const Song = ({ metadata }: SongProps) => {
+export const Song = ({ song }: SongProps) => {
     const trigger = useRef<HTMLDivElement>(null)
 
     const navigate = useNavigate()
@@ -30,10 +30,31 @@ export const Song = ({ metadata }: SongProps) => {
         <ContextMenu>
             <ContextMenuTrigger ref={trigger}>
                 <Button variant="outline" className="h-12 w-full p-0 items-center flex mt-2" onClick={() => {
-                    navigate(`/song-play/${metadata.uuid}`)
+                    navigate(`/song-play/${song.uuid}`)
                 }}>
                     <div className="bg-neutral-700 w-6 h-full shrink-0"></div>
-                    <p className="px-4 w-full text-start">{metadata.artists.join(", ")} - {metadata.title}</p>
+                    <p className="px-4 w-full text-start">
+                        {
+                            song.artists?.length > 0 ? (
+                                <span>
+                                    {song.artists.join(", ")}
+                                </span>
+                            ) : (
+                                <span className="text-neutral-400">
+                                    unknown
+                                </span>
+                            )
+                        }
+                        <span> - </span>
+                        {
+                            song.title ? (
+                                <span>{song.title}</span>
+                            ) : (
+                                <span className="text-neutral-400">unknown</span>
+                            )
+                        }
+                        
+                        </p>
                     <div onClick={(event) => {
                         event.preventDefault()
                         event.stopPropagation()

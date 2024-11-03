@@ -15,6 +15,7 @@ import { createSong } from "@/features/song-select/functions/create-song";
 export const SongSelect = () => {
     const [loading, setLoading] = useState(true)
     const [selectAudioOpen, setSelectAudioOpen] = useState(false)
+    const [selectAudioLoading, setSelectAudioLoading] = useState(false)
     const [songs, setSongs] = useAtom(songsAtom)
 
     const navigate = useNavigate()
@@ -34,9 +35,10 @@ export const SongSelect = () => {
                     <p>select a song</p>
                     <SelectAudio onSelect={(file) => {
                         setAudioFile(file)
+                        setSelectAudioLoading(true)
                         createSong(file)
                         navigate("/song-edit/new/details")
-                    }} open={selectAudioOpen} setOpen={setSelectAudioOpen}>
+                    }} open={selectAudioOpen} loading={selectAudioLoading} setOpen={setSelectAudioOpen}>
                         <DrawerTrigger>
                             <Button variant="outline" onClick={() => setSelectAudioOpen(true)}>
                                 map new song +
@@ -56,7 +58,7 @@ export const SongSelect = () => {
 
                     {
                         songs?.map((song) => {
-                            return <Song key={song.uuid} metadata={song} />
+                            return <Song key={song.uuid} song={song} />
                         })
                     }
 

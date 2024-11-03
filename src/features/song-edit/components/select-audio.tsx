@@ -1,9 +1,10 @@
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { useCallback, useState } from "react"
 import { FileRejection, useDropzone } from 'react-dropzone'
+import { BiLoaderAlt } from "react-icons/bi"
 import { twMerge } from "tailwind-merge"
 
-export const SelectAudio = ({ children, onSelect, open, setOpen }: { children: React.ReactNode, onSelect: (file: File) => void, open: boolean, setOpen: (value: boolean) => void}) => {
+export const SelectAudio = ({ children, onSelect, open, setOpen, loading }: { children: React.ReactNode, onSelect: (file: File) => void, open: boolean, setOpen: (value: boolean) => void, loading?: boolean}) => {
     const [wrongFile, setWrongFile] = useState(false)
 
     const onDrop = useCallback((acceptedFiles: any[], fileRejections: FileRejection[]) => {
@@ -39,12 +40,22 @@ export const SelectAudio = ({ children, onSelect, open, setOpen }: { children: R
                     </DrawerTitle>
 
                     <div className="w-full flex items-center justify-center px-4 py-4">
-                        <div {...getRootProps({ className: 'dropzone' })} className={twMerge(
-                            "w-[600px] border-4 border-dashed flex justify-center px-4 py-8",
-                            isDragActive ? "border-neutral-100" : "border-neutral-600"
-                        )}>
-                            <input {...getInputProps()} />
-                            <p>drop an mp3 file, or click here to browse</p>
+                        <div className="h-[96px]">
+                            {
+                                loading ? (
+                                    <div className="h-full flex items-center justify-center">
+                                        <BiLoaderAlt className="animate-spin" />
+                                    </div>
+                                ) : (
+                                    <div {...getRootProps({ className: 'dropzone' })} className={twMerge(
+                                        "w-[600px] border-4 h-full border-dashed flex justify-center px-4 py-8",
+                                        isDragActive ? "border-neutral-100" : "border-neutral-600"
+                                    )}>
+                                        <input {...getInputProps()} />
+                                        <p>drop an mp3 file, or click here to browse</p>
+                                    </div>
+                                )
+                            }
                         </div>
                     </div>
 

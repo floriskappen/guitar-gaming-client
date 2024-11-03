@@ -1,4 +1,4 @@
-use std::fs::{self, File};
+use std::{fs::{self, File}, io::Write};
 
 use uuid::Uuid;
 use tauri::{AppHandle, Manager};
@@ -29,7 +29,15 @@ pub fn create_song_empty(app_handle: AppHandle) -> String {
 
     // Create an empty metadata.json file
     let metadata_path = song_directory.join("metadata.json");
-    File::create(metadata_path).unwrap();
+    let mut file = File::create(metadata_path).unwrap();
+    let song_empty = Song {
+        uuid: uuid_string.clone(),
+        title: None,
+        artists: None,
+        tuning: None,
+        duration_seconds: None
+    };
+    file.write_all(serde_json::to_string(&song_empty).expect("Failed to serialize JSON").as_bytes()).unwrap();
 
     return uuid_string;
 }
