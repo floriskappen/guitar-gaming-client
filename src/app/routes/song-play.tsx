@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom"
-import { Canvas } from '@react-three/fiber'
 
 export const SongPlayRoute = () => {
     let { uuid } = useParams()

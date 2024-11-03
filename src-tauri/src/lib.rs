@@ -5,6 +5,7 @@ use tauri::Manager;
 
 pub mod helpers {
     pub mod notes;
+    pub mod sonic_annotator;
     pub mod tuning;
 }
 pub mod commands {
@@ -50,6 +51,7 @@ pub fn run() {
             commands::songs::commands::create_song_empty,
             commands::songs::commands::update_song_by_uuid,
             commands::songs::commands::delete_song_by_uuid,
+            commands::songs::commands::get_song_tempo_by_uuid,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

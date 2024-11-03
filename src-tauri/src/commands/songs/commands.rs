@@ -3,7 +3,7 @@ use std::{fs::{self, File}, io::Write};
 use uuid::Uuid;
 use tauri::{AppHandle, Manager};
 
-use crate::commands::songs::helpers::get_songs as get_songs_helper;
+use crate::{commands::songs::helpers::get_songs as get_songs_helper, helpers::sonic_annotator::get_tempo};
 use super::structs::Song;
 
 
@@ -84,4 +84,21 @@ pub fn delete_song_by_uuid(app_handle: AppHandle, uuid: String) {
         fs::remove_dir_all(song_directory).expect("Failed to remove song directory");
     }
 
+}
+
+#[tauri::command]
+pub fn get_song_tempo_by_uuid(app_handle: AppHandle, uuid: String) {
+    let app_data_directory = app_handle.path().app_data_dir().unwrap();
+    let songs_directory = app_data_directory.join("songs");
+
+    let songs = get_songs_helper(app_data_directory, true);
+    let song_option = songs.iter().find(|&song| song.uuid == uuid).map(|song| song.clone());
+
+    if let Some(song) = song_option {
+        let song_directory = songs_directory.join(song.uuid.clone());
+        let song_audio_directory = song_directory.join("audio.mp3");
+        get_tempo(
+            app_handle.path().resource_dir().unwrap(), song_audio_directory
+        ).expect("error calculating tempo");
+    }
 }

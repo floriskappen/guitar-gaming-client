@@ -3,6 +3,7 @@
 
 pub mod helpers {
     pub mod notes;
+    pub mod sonic_annotator;
     pub mod tuning;
 }
 pub mod commands {

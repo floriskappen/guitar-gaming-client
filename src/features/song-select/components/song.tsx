@@ -6,7 +6,6 @@ import { Song as SongType } from "@/types/song";
 import { useRef, useState } from "react"
 import { BsThreeDots } from "react-icons/bs"
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
-import { FaListUl } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import { deleteSongByUuid } from "../internal-api/delete-song-by-uuid";
