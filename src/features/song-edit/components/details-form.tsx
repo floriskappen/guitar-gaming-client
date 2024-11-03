@@ -12,13 +12,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { SelectAudio } from "./select-audio"
-import { audioFileAtom, songEditAtom } from "../atoms/song-edit"
+import { songEditAtom } from "../atoms/song-edit"
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { DrawerTrigger } from "@/components/ui/drawer"
 import { IoClose } from "react-icons/io5";
 import { BiPlus } from "react-icons/bi"
 import { useNavigate, useParams } from "react-router-dom"
+import { updateSongByUuid } from "../internal-api/update-song-by-uuid"
+import { updateSongAudioFileByUuid } from "@/features/functions/update-song-audio-file-by-uuid"
  
 const formSchema = z.object({
     artists: z.array(
@@ -32,9 +34,10 @@ const formSchema = z.object({
 })
 
 export const SongDetailsForm = () => {
-    const [audioFile, setAudioFile] = useAtom(audioFileAtom)
     const [song, setSong] = useAtom(songEditAtom)
+    const [saveLoading, setSaveLoading] = useState(false)
     const [selectAudioOpen, setSelectAudioOpen] = useState(false)
+    const [selectAudioLoading, setSelectAudioLoading] = useState(false)
     const [currentArtistInputValue, setCurrentArtistInputValue] = useState<string>("")
     const [artists, setArtists] = useState<string[]>(song?.artists || [])
 
@@ -51,17 +54,23 @@ export const SongDetailsForm = () => {
     })
     const { setValue } = form;
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        if (audioFile && uuid) {
-            setSong({
-                audio: audioFile,
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (uuid) {
+            setSaveLoading(true)
+            const newSong = await updateSongByUuid(uuid, {
                 artists: values.artists,
                 title: values.title,
                 uuid,
                 duration_seconds: null,
-                tuning: []
+                tuning: null
             })
-            navigate(`/song-edit/${uuid}/midi-editor`)
+            if (newSong) {
+                setSong(newSong)
+            }
+
+            setSaveLoading(false)
+
+            navigate(`/song-edit/${uuid}/timing-editor`)
         }
     }
 
@@ -76,20 +85,6 @@ export const SongDetailsForm = () => {
 
     return (
         <Form {...form}>
-            <div>
-                <p>selected audio file: {audioFile?.name}</p>
-                <SelectAudio onSelect={(newAudioFile) => {
-                    setAudioFile(newAudioFile)
-                    setSelectAudioOpen(false)
-                }} open={selectAudioOpen} setOpen={setSelectAudioOpen}>
-                    <DrawerTrigger>
-                        <Button className="mt-4" variant="secondary" onClick={(e) => {
-                            e.preventDefault()
-                            setSelectAudioOpen(true)
-                        }}>select a different mp3 file</Button>
-                    </DrawerTrigger>
-                </SelectAudio>
-            </div>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-8">
                 <FormField
                     control={form.control}
@@ -149,9 +144,25 @@ export const SongDetailsForm = () => {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Save</Button>
+
+                <div className="flex space-x-2 items-center">
+                    <Button type="submit" disabled={saveLoading}>save</Button>
+
+                    <SelectAudio onSelect={async (newAudioFile) => {
+                        setSelectAudioLoading(true)
+                        await updateSongAudioFileByUuid(song!.uuid, newAudioFile)
+                        setSelectAudioOpen(false)
+                        setSelectAudioLoading(false)
+                    }} open={selectAudioOpen} setOpen={setSelectAudioOpen} loading={selectAudioLoading}>
+                        <DrawerTrigger>
+                            <Button variant="secondary" onClick={(e) => {
+                                e.preventDefault()
+                                setSelectAudioOpen(true)
+                            }}>change audio file</Button>
+                        </DrawerTrigger>
+                    </SelectAudio>
+                </div>
             </form>
         </Form>
-        
     )
 }

@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { ThemeProvider } from "@/providers/theme-provider"
 
 type AppProviderProps = {
@@ -7,7 +8,9 @@ type AppProviderProps = {
 export const AppProvider = ({ children }: AppProviderProps) => {
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-           {children}
+            <TooltipProvider>
+                {children}
+            </TooltipProvider>
         </ThemeProvider>
     )
 }

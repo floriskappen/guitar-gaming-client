@@ -1,4 +1,4 @@
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { useCallback, useState } from "react"
 import { FileRejection, useDropzone } from 'react-dropzone'
 import { BiLoaderAlt } from "react-icons/bi"

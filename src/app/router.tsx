@@ -25,25 +25,34 @@ export const createAppRouter = () => {
             }
         },
         {
-            path: "/song-edit/:uuid/midi-editor",
+            path: "/song-edit/:uuid",
             lazy: async () => {
-                const { SongEditMidiEditorRoute } = await import("./routes/song-edit/midi-editor");
-                return { Component: SongEditMidiEditorRoute }
-            }
-        },
-        {
-            path: "/song-edit/:uuid/details",
-            lazy: async () => {
-                const { SongEditSongDetailsRoute } = await import("./routes/song-edit/song-details");
-                return { Component: SongEditSongDetailsRoute }
-            }
-        },
-        {
-            path: "/song-edit/:uuid/timing-editor",
-            lazy: async () => {
-                const { SongEditTimingEditor } = await import("./routes/song-edit/timing-editor");
-                return { Component: SongEditTimingEditor }
-            }
+                const { Layout: SongEditLayout } = await import("@/features/song-edit/components/layout");
+                return { Component: SongEditLayout };
+            },
+            children: [
+                {
+                    path: "/song-edit/:uuid/midi-editor",
+                    lazy: async () => {
+                        const { SongEditMidiEditorRoute } = await import("./routes/song-edit/midi-editor");
+                        return { Component: SongEditMidiEditorRoute }
+                    }
+                },
+                {
+                    path: "/song-edit/:uuid/details",
+                    lazy: async () => {
+                        const { SongEditDetailsRoute } = await import("./routes/song-edit/details");
+                        return { Component: SongEditDetailsRoute }
+                    }
+                },
+                {
+                    path: "/song-edit/:uuid/timing-editor",
+                    lazy: async () => {
+                        const { SongEditTimingEditor } = await import("./routes/song-edit/timing-editor");
+                        return { Component: SongEditTimingEditor }
+                    }
+                },
+            ]
         },
         {
             path: "/song-play/:uuid",

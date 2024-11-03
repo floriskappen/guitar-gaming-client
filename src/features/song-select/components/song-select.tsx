@@ -33,11 +33,11 @@ export const SongSelect = () => {
             <div className="w-[600px]">
                 <div className="w-full items-center flex justify-between">
                     <p>select a song</p>
-                    <SelectAudio onSelect={(file) => {
+                    <SelectAudio onSelect={async (file) => {
                         setAudioFile(file)
                         setSelectAudioLoading(true)
-                        createSong(file)
-                        navigate("/song-edit/new/details")
+                        const uuid = await createSong(file)
+                        navigate(`/song-edit/${uuid}/details`)
                     }} open={selectAudioOpen} loading={selectAudioLoading} setOpen={setSelectAudioOpen}>
                         <DrawerTrigger>
                             <Button variant="outline" onClick={() => setSelectAudioOpen(true)}>

@@ -12,7 +12,14 @@ pub fn get_songs(app_handle: AppHandle, use_cache: bool) -> Vec<Song> {
     return songs;
 }
 
-// Creates a new song by generating a uuid, creating a directory for it with an empty metadata.json file
+#[tauri::command]
+pub fn get_song_by_uuid(app_handle: AppHandle, uuid: String) -> Option<Song> {
+    let app_data_directory = app_handle.path().app_data_dir().unwrap();
+    let songs = get_songs_helper(app_data_directory, true);
+    return songs.iter().find(|&song| song.uuid == uuid).map(|song| song.clone());
+}
+
+// Creates a new song by generating a uuid, creating a directory for it with a metadata.json file
 #[tauri::command]
 pub fn create_song_empty(app_handle: AppHandle) -> String {
     let app_data_directory = app_handle.path().app_data_dir().unwrap();
@@ -40,4 +47,39 @@ pub fn create_song_empty(app_handle: AppHandle) -> String {
     file.write_all(serde_json::to_string(&song_empty).expect("Failed to serialize JSON").as_bytes()).unwrap();
 
     return uuid_string;
+}
+
+#[tauri::command]
+pub fn update_song_by_uuid(app_handle: AppHandle, uuid: String, updated_song_data: Song) -> Option<Song> {
+    let app_data_directory = app_handle.path().app_data_dir().unwrap();
+    let songs_directory = app_data_directory.join("songs");
+
+    let songs = get_songs_helper(app_data_directory, true);
+    let song_option = songs.iter().find(|&song| song.uuid == uuid).map(|song| song.clone());
+
+    if let Some(song) = song_option {
+        let song_directory = songs_directory.join(song.uuid.clone());
+        let metadata_path = song_directory.join("metadata.json");
+
+        let mut file = File::create(metadata_path).unwrap();
+        file.write_all(serde_json::to_string(&updated_song_data).expect("Failed to serialize JSON").as_bytes()).unwrap();
+        return Some(updated_song_data)
+    }
+
+    return None
+}
+
+#[tauri::command]
+pub fn delete_song_by_uuid(app_handle: AppHandle, uuid: String) {
+    let app_data_directory = app_handle.path().app_data_dir().unwrap();
+    let songs_directory = app_data_directory.join("songs");
+
+    let songs = get_songs_helper(app_data_directory, true);
+    let song_option = songs.iter().find(|&song| song.uuid == uuid).map(|song| song.clone());
+
+    if let Some(song) = song_option {
+        let song_directory = songs_directory.join(song.uuid.clone());
+        fs::remove_dir_all(song_directory).expect("Failed to remove song directory");
+    }
+
 }
