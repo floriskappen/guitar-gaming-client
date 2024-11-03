@@ -5,4 +5,5 @@ export type Song = {
     artists: string[] | null
     tuning: string[] | null
     duration_seconds: number | null
+    bpm: number | null
 }

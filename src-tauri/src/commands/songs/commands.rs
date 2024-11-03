@@ -44,7 +44,8 @@ pub fn create_song_empty(app_handle: AppHandle) -> String {
         title: None,
         artists: None,
         tuning: None,
-        duration_seconds: None
+        duration_seconds: None,
+        bpm: None
     };
     file.write_all(serde_json::to_string(&song_empty).expect("Failed to serialize JSON").as_bytes()).unwrap();
 
@@ -87,7 +88,7 @@ pub fn delete_song_by_uuid(app_handle: AppHandle, uuid: String) {
 }
 
 #[tauri::command]
-pub fn get_song_tempo_by_uuid(app_handle: AppHandle, uuid: String) {
+pub async fn get_song_tempo_by_uuid(app_handle: AppHandle, uuid: String) -> Option<f64> {
     let app_data_directory = app_handle.path().app_data_dir().unwrap();
     let songs_directory = app_data_directory.join("songs");
 
@@ -97,8 +98,9 @@ pub fn get_song_tempo_by_uuid(app_handle: AppHandle, uuid: String) {
     if let Some(song) = song_option {
         let song_directory = songs_directory.join(song.uuid.clone());
         let song_audio_directory = song_directory.join("audio.mp3");
-        get_tempo(
+        return Some(get_tempo(
             app_handle.path().resource_dir().unwrap(), song_audio_directory
-        ).expect("error calculating tempo");
+        ).expect("error calculating tempo"));
     }
+    return None
 }

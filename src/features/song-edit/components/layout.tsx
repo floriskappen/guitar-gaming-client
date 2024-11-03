@@ -1,18 +1,22 @@
 import { Sidebar } from "@/features/song-edit/components/sidebar"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Menubar } from "@/features/song-edit/components/menubar"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { songEditAtom } from "../atoms/song-edit";
 import { useSetAtom } from "jotai";
 import { useNavigate, useParams, Outlet } from "react-router-dom";
 import { getSongByUuid } from "@/internal-api/get-song-by-uuid";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { BiLoaderAlt } from "react-icons/bi";
+import { toast } from "sonner";
+import { getSongTempoByUuid } from "../internal-api/get-song-tempo-by-uuid";
+import { updateSongByUuid } from "../internal-api/update-song-by-uuid";
 
 export const Layout = () => {
     const [loading, setLoading] = useState(true)
     const [noUuidAlertOpen, setNoUuidAlertOpen] = useState(false)
     const setSongEdit = useSetAtom(songEditAtom);
+    const bpmDetectionStarted = useRef(false);
 
     let { uuid } = useParams()
     const navigate = useNavigate()
@@ -23,6 +27,20 @@ export const Layout = () => {
                 const song = await getSongByUuid(uuid)
                 setSongEdit(song)
                 setLoading(false)
+
+                if (!bpmDetectionStarted.current && !song?.bpm) {
+                    bpmDetectionStarted.current = true
+                    toast("detecting song bpm...")
+                    const bpm = await getSongTempoByUuid(uuid!)
+                    toast("bpm detection complete", {
+                        description: `song seems to be ${bpm} bpm`
+                    })
+                    const updatedSong = await updateSongByUuid(song!.uuid, {
+                        ...song!,
+                        bpm
+                    })
+                    setSongEdit(updatedSong)
+                }
             } else {
                 setNoUuidAlertOpen(true)
             }

@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { ThemeProvider } from "@/providers/theme-provider"
 
@@ -10,6 +11,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <TooltipProvider>
                 {children}
+                <Toaster />
             </TooltipProvider>
         </ThemeProvider>
     )

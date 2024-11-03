@@ -79,6 +79,7 @@ export const SongDetailsForm = () => {
     })
     const { setValue, getValues } = form;
 
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (uuid) {
             setSaveLoading(true)
@@ -87,7 +88,8 @@ export const SongDetailsForm = () => {
                 title: values.title,
                 uuid,
                 duration_seconds: null,
-                tuning: values.tuning
+                tuning: values.tuning,
+                bpm: null
             })
             if (newSong) {
                 setSong(newSong)
@@ -100,8 +102,7 @@ export const SongDetailsForm = () => {
     }
 
     function addArtist(artist: string) {
-        let newArtists = artists
-        newArtists.push(artist)
+        const newArtists = [...artists, artist]
         setArtists(newArtists)
         setValue("artists", newArtists)
         setCurrentArtistInputValue("")

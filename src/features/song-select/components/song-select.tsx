@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Song } from "./song"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { getSongs } from "../internal-api/get-songs"
 
 import { BiLoaderAlt } from "react-icons/bi";
@@ -17,15 +17,19 @@ export const SongSelect = () => {
     const [selectAudioOpen, setSelectAudioOpen] = useState(false)
     const [selectAudioLoading, setSelectAudioLoading] = useState(false)
     const [songs, setSongs] = useAtom(songsAtom)
+    const getSongsStarted = useRef(false)
 
     const navigate = useNavigate()
     const setAudioFile = useSetAtom(audioFileAtom)
 
     useEffect(() => {
-        getSongs(true).then((data) => {
-            setSongs(data)
-            setLoading(false)
-        })
+        if (!getSongsStarted.current) {
+            getSongsStarted.current = true
+            getSongs(true).then((data) => {
+                setSongs(data)
+                setLoading(false)
+            })
+        }
     }, [])
 
     return (

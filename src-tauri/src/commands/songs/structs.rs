@@ -6,4 +6,5 @@ pub struct Song {
     pub artists: Option<Vec<String>>,
     pub tuning: Option<Vec<String>>,
     pub duration_seconds: Option<f32>,
+    pub bpm: Option<f32>,
 }

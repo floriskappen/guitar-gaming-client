@@ -1,17 +1,14 @@
-import { getSongTempoByUuid } from "@/features/song-edit/internal-api/get-song-tempo-by-uuid"
-import { useEffect } from "react"
+import { songEditAtom } from "@/features/song-edit/atoms/song-edit"
+import { useAtom } from "jotai"
 import { useParams } from "react-router-dom"
 
 export const SongEditTimingEditor = () => {
     let { uuid } = useParams()
-
-    useEffect(() => {
-        getSongTempoByUuid(uuid!)
-    })
+    const [song, setSong] = useAtom(songEditAtom)
 
     return (
         <div className="w-full px-8 ml-6">
-            <p>song edit - timing editor: {uuid}</p>
+            <p>song edit - bpm: {song!.bpm}</p>
         </div>
     )   
 }
