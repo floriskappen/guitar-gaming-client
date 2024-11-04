@@ -4,12 +4,11 @@ import { useEffect, useRef, useState } from "react"
 import { getSongs } from "../internal-api/get-songs"
 
 import { BiLoaderAlt } from "react-icons/bi";
-import { useAtom, useSetAtom } from "jotai"
+import { useAtom } from "jotai"
 import { songsAtom } from "@/features/song-select/atoms/song-select"
 import { useNavigate } from "react-router-dom";
 import { DrawerTrigger } from "@/components/ui/drawer";
 import { SelectAudio } from "@/features/song-edit/components/select-audio";
-import { audioFileAtom } from "@/features/song-edit/atoms/song-edit";
 import { createSong } from "@/features/song-select/functions/create-song";
 
 export const SongSelect = () => {
@@ -20,7 +19,6 @@ export const SongSelect = () => {
     const getSongsStarted = useRef(false)
 
     const navigate = useNavigate()
-    const setAudioFile = useSetAtom(audioFileAtom)
 
     useEffect(() => {
         if (!getSongsStarted.current) {
@@ -38,7 +36,6 @@ export const SongSelect = () => {
                 <div className="w-full items-center flex justify-between">
                     <p>select a song</p>
                     <SelectAudio onSelect={async (file) => {
-                        setAudioFile(file)
                         setSelectAudioLoading(true)
                         const uuid = await createSong(file)
                         navigate(`/song-edit/${uuid}/details`)

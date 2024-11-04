@@ -8,7 +8,7 @@ export const SongEditTimingEditor = () => {
 
     return (
         <div className="w-full px-8 ml-6">
-            <p>song edit - bpm: {song!.bpm}</p>
+            <p>song edit - bpm: {song?.bpm}</p>
         </div>
-    )   
+    )
 }

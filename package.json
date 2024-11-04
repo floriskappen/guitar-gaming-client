@@ -30,7 +30,6 @@
     "@tauri-apps/plugin-fs": "^2.0.1",
     "@tauri-apps/plugin-shell": "^2",
     "@types/three": "^0.169.0",
-    "@wavesurfer/react": "^1.0.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "jotai": "^2.10.1",

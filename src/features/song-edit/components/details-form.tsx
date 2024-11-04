@@ -20,7 +20,7 @@ import { IoClose } from "react-icons/io5";
 import { BiPlus } from "react-icons/bi"
 import { useNavigate, useParams } from "react-router-dom"
 import { updateSongByUuid } from "../internal-api/update-song-by-uuid"
-import { updateSongAudioFileByUuid } from "@/features/functions/update-song-audio-file-by-uuid"
+import { updateSongAudioFileByUuid } from "@/features/song-edit/functions/update-song-audio-file-by-uuid"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
  
 const formSchema = z.object({
@@ -84,12 +84,10 @@ export const SongDetailsForm = () => {
         if (uuid) {
             setSaveLoading(true)
             const newSong = await updateSongByUuid(uuid, {
+                ...song!,
                 artists: values.artists,
                 title: values.title,
-                uuid,
-                duration_seconds: null,
                 tuning: values.tuning,
-                bpm: null
             })
             if (newSong) {
                 setSong(newSong)
@@ -107,7 +105,6 @@ export const SongDetailsForm = () => {
         setValue("artists", newArtists)
         setCurrentArtistInputValue("")
     }
-    
 
     return (
         <Form {...form}>
