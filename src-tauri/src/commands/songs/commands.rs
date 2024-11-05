@@ -3,7 +3,7 @@ use std::{fs::{self, File}, io::Write};
 use uuid::Uuid;
 use tauri::{AppHandle, Manager};
 
-use crate::{commands::songs::helpers::get_songs as get_songs_helper, helpers::sonic_annotator::get_tempo};
+use crate::{commands::songs::helpers::get_songs as get_songs_helper, features::audio_feature_extraction::audio_feature_extraction::get_tempo};
 use super::structs::Song;
 
 
