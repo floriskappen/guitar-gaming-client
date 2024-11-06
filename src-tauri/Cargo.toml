@@ -29,5 +29,5 @@ cpal = "0.15.3"
 pitch-detection = "0.3.0"
 uuid = "1.11.0"
 tauri-plugin-fs = "2"
-symphonia = "0.5.4"
+symphonia = { version = "0.5.4", features = ["mp3", "aac", "wav"] }
 

@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Menubar } from "@/features/song-edit/components/menubar"
 import { useEffect, useRef, useState } from "react";
 import { songEditAtom } from "../atoms/song-edit";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useNavigate, useParams, Outlet } from "react-router-dom";
 import { getSongByUuid } from "@/internal-api/get-song-by-uuid";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -13,11 +13,18 @@ import { getSongTempoByUuid } from "../internal-api/get-song-tempo-by-uuid";
 import { updateSongByUuid } from "../internal-api/update-song-by-uuid";
 import { Audio } from "./audio";
 import { AudioProgressBar } from "./audio-progress-bar";
+import { getSongWaveformByUuid } from "../internal-api/get-song-waveform-by-uuid";
+import { WaveformData } from "@/types/waveform_data";
+import { AudioWaveform } from "@/features/audio-waveform/components/audio-waveform";
+import { audioCurrentTimeAtom, audioDurationAtom } from "../atoms/audio";
 
 export const Layout = () => {
     const [loading, setLoading] = useState(true)
     const [noUuidAlertOpen, setNoUuidAlertOpen] = useState(false)
+    const [waveformData, setWaveformData] = useState<WaveformData | null>(null)
     const setSongEdit = useSetAtom(songEditAtom);
+    const audioCurrentTime = useAtomValue(audioCurrentTimeAtom)
+    const audioDuration = useAtomValue(audioDurationAtom)
     const bpmDetectionStarted = useRef(false);
 
     let { uuid } = useParams()
@@ -26,6 +33,8 @@ export const Layout = () => {
     useEffect(() => {
         const fetchSongData = async () => {
             if (uuid) {
+                const waveform = await getSongWaveformByUuid(uuid);
+                setWaveformData(waveform)
                 let song = await getSongByUuid(uuid)
                 setSongEdit(song)
                 setLoading(false)
@@ -99,6 +108,9 @@ export const Layout = () => {
                                 </div>
                             </div>
                             <div>
+                                {waveformData ? (
+                                    <AudioWaveform waveformData={waveformData} currentTime={audioCurrentTime} duration={audioDuration} />
+                                ) : null}
                                 <AudioProgressBar />
                             </div>
                         </div>

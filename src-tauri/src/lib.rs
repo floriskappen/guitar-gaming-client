@@ -64,6 +64,7 @@ pub fn run() {
             commands::songs::commands::update_song_by_uuid,
             commands::songs::commands::delete_song_by_uuid,
             commands::songs::commands::get_song_tempo_by_uuid,
+            commands::songs::commands::get_song_waveform_by_uuid,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

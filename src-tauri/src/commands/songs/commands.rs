@@ -3,7 +3,7 @@ use std::{fs::{self, File}, io::Write};
 use uuid::Uuid;
 use tauri::{AppHandle, Manager};
 
-use crate::{commands::songs::helpers::get_songs as get_songs_helper, features::audio_feature_extraction::audio_feature_extraction::get_tempo};
+use crate::{commands::songs::helpers::get_songs as get_songs_helper, features::audio_feature_extraction::{audio_feature_extraction::get_tempo, helpers::waveform::get_or_generate_waveform_by_song_uuid, structs::waveform_data::WaveformData}};
 use super::structs::Song;
 
 
@@ -104,3 +104,15 @@ pub async fn get_song_tempo_by_uuid(app_handle: AppHandle, uuid: String) -> Opti
     }
     return None
 }
+
+
+#[tauri::command]
+pub async fn get_song_waveform_by_uuid(app_handle: AppHandle, uuid: String) -> Option<WaveformData> {
+    let app_data_directory = app_handle.path().app_data_dir().unwrap();
+
+    let waveform_data = get_or_generate_waveform_by_song_uuid(app_data_directory, uuid.clone())
+        .expect(format!("Error generating waveform for song {}", uuid).as_str());
+
+   return Some(waveform_data);
+}
+

@@ -1,5 +1,5 @@
 import { getSongAudioBlobByUuid } from "@/functions/get-song-audio-blob-by-uuid"
-import { useSetAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import { audioBlobAtom, audioCurrentTimeAtom, audioDurationAtom, audioLoadingAtom, audioPausedAtom, audioRefAtom } from "../atoms/audio"
@@ -8,12 +8,13 @@ export const Audio = () => {
     let { uuid } = useParams()
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const lastUpdateRef = useRef(Date.now());
 
     const setAudioRef = useSetAtom(audioRefAtom);
     const setAudioBlob = useSetAtom(audioBlobAtom);
     const setAudioCurrentTime = useSetAtom(audioCurrentTimeAtom);
     const setAudioDuraton = useSetAtom(audioDurationAtom);
-    const setAudioPaused = useSetAtom(audioPausedAtom);
+    const [audioPaused, setAudioPaused] = useAtom(audioPausedAtom);
     const setAudioLoading = useSetAtom(audioLoadingAtom);
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -37,8 +38,21 @@ export const Audio = () => {
             }
         }
     };
-  
 
+    const updateTime = () => {
+        const now = Date.now();
+        if (now - lastUpdateRef.current >= 33) {  // ~30fps
+          if (audioRef.current) {
+            setAudioCurrentTime(audioRef.current.currentTime);
+          }
+          lastUpdateRef.current = now;
+        }
+ 
+        if (!audioPaused) {
+          requestAnimationFrame(updateTime);
+        }
+    };
+  
     useEffect(() => {
         setAudioCurrentTime(0)
 
@@ -60,6 +74,12 @@ export const Audio = () => {
     }, [uuid])
 
     useEffect(() => {
+        if (!audioPaused) {
+            requestAnimationFrame(updateTime)
+        }
+    }, [audioPaused])
+
+    useEffect(() => {
         if (audioUrl && audioRef.current) {
             setAudioRef(audioRef)
             setAudioPaused(true)
@@ -67,7 +87,7 @@ export const Audio = () => {
     }, [audioUrl, setAudioRef, setAudioPaused]);
 
     const handleTimeUpdate = () => {
-        if (audioRef.current) {
+        if (audioRef.current && audioRef.current.paused) {
             setAudioCurrentTime(audioRef.current.currentTime);
         }
     };
