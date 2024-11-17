@@ -5,9 +5,6 @@ export const audioRefAtom = atom<MutableRefObject<HTMLAudioElement | null> | nul
     null
 ) as PrimitiveAtom<MutableRefObject<HTMLAudioElement | null> | null>;
 
-export const audioBlobAtom = atom<Blob | null>(
-    null
-) as PrimitiveAtom<Blob | null>;
 export const audioCurrentTimeAtom = atom(0)
 export const audioDurationAtom = atom(0)
 export const audioPausedAtom = atom(true)

@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { audioCurrentTimeAtom, audioDurationAtom, audioLoadingAtom, audioPausedAtom, audioRefAtom } from "../atoms/audio"
 import { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
@@ -10,10 +10,10 @@ import { Separator } from "@/components/ui/separator"
 export const AudioProgressBar = () => {
     const audioCurrentTime = useAtomValue(audioCurrentTimeAtom)
     const audioDuration = useAtomValue(audioDurationAtom)
-    const audioPaused = useAtomValue(audioPausedAtom)
     const audioRef = useAtomValue(audioRefAtom)
     const audioLoading = useAtomValue(audioLoadingAtom)
-
+    const [audioPaused, setAudioPaused] = useAtom(audioPausedAtom)
+    
     const [dimensions, setDimensions] = useState({ width: 0, left: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [audioPausedBeforeDrag, setAudioPausedBeforeDrag] = useState(false);
@@ -114,11 +114,7 @@ export const AudioProgressBar = () => {
                         <>
                             <div className="flex items-center w-[200px]">
                                 <Button className="h-[48px] w-[48px]" onClick={(() => {
-                                    if (audioPaused) {
-                                        audioRef?.current?.play()
-                                    } else {
-                                        audioRef?.current?.pause()
-                                    }
+                                    setAudioPaused(!audioPaused)
                                 })} variant={"ghost"}>
                                     {
                                         audioPaused ? <Play size="16" /> : <Pause size="16" />
