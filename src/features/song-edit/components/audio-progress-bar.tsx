@@ -1,22 +1,24 @@
-import { useAtom, useAtomValue } from "jotai"
-import { audioCurrentTimeAtom, audioDurationAtom, audioLoadingAtom, audioPausedAtom, audioRefAtom } from "../atoms/audio"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { audioCurrentTimeAtom, audioDurationAtom, audioLoadingAtom, audioPausedAtom } from "../atoms/audio"
 import { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { Button } from "@/components/ui/button"
 import { Pause, Play } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
+import useAudioCurrentTime from "../hooks/use-audio-current-time"
 
 export const AudioProgressBar = () => {
     const audioCurrentTime = useAtomValue(audioCurrentTimeAtom)
     const audioDuration = useAtomValue(audioDurationAtom)
-    const audioRef = useAtomValue(audioRefAtom)
     const audioLoading = useAtomValue(audioLoadingAtom)
     const [audioPaused, setAudioPaused] = useAtom(audioPausedAtom)
-    
+    const setAudioCurrentTime = useSetAtom(audioCurrentTimeAtom)
+
     const [dimensions, setDimensions] = useState({ width: 0, left: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [audioPausedBeforeDrag, setAudioPausedBeforeDrag] = useState(false);
+    const localAudioCurrentTime = useAudioCurrentTime()
     const barRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -56,14 +58,14 @@ export const AudioProgressBar = () => {
     }
 
     const updateProgress = (clientX: number) => {
-        if (dimensions.width > 0 && audioRef?.current) {
+        if (dimensions.width > 0) {
             const clickPosition = clientX - dimensions.left;
             const clickPercentage = Math.min(
               1,
               Math.max(0, (clickPosition / dimensions.width))
             );
-            audioRef.current.currentTime = audioDuration * clickPercentage
-            // Use this percentage to update audio playback or other actions
+            console.log(audioDuration * clickPercentage)
+            setAudioCurrentTime(audioDuration * clickPercentage)
         }
     };
 
@@ -71,7 +73,7 @@ export const AudioProgressBar = () => {
         setIsDragging(true);
         updateProgress(event.clientX);
         setAudioPausedBeforeDrag(audioPaused)
-        audioRef?.current?.pause();
+        setAudioPaused(true)
     };
     
     const handleBarMouseMove = (event: MouseEvent) => {
@@ -84,7 +86,7 @@ export const AudioProgressBar = () => {
         if (isDragging) {
             setIsDragging(false);
             if (audioPausedBeforeDrag === false) {
-                audioRef?.current?.play();
+                setAudioPaused(false)
             }
         }
     };
@@ -140,7 +142,7 @@ export const AudioProgressBar = () => {
                                     )}
                                     style={{
                                         left: `${dimensions.left + (
-                                            (dimensions.width - 4) * (audioCurrentTime / audioDuration)
+                                            (dimensions.width - 4) * (localAudioCurrentTime / audioDuration)
                                         )}px`,
                                         transform: `translate(0%, -100%)`,
                                     }}

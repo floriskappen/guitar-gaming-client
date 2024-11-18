@@ -17,13 +17,14 @@ import { getSongWaveformByUuid } from "../internal-api/get-song-waveform-by-uuid
 import { WaveformData } from "@/types/waveform_data";
 import { AudioWaveform } from "@/features/audio-waveform/components/audio-waveform";
 import { audioCurrentTimeAtom, audioDurationAtom } from "../atoms/audio";
+import useAudioCurrentTime from "../hooks/use-audio-current-time";
 
 export const Layout = () => {
     const [loading, setLoading] = useState(true)
     const [noUuidAlertOpen, setNoUuidAlertOpen] = useState(false)
     const [waveformData, setWaveformData] = useState<WaveformData | null>(null)
     const setSongEdit = useSetAtom(songEditAtom);
-    const audioCurrentTime = useAtomValue(audioCurrentTimeAtom)
+    const localAudioCurrentTime = useAudioCurrentTime()
     const audioDuration = useAtomValue(audioDurationAtom)
     const bpmDetectionStarted = useRef(false);
 
@@ -109,7 +110,7 @@ export const Layout = () => {
                             </div>
                             <div>
                                 {waveformData ? (
-                                    <AudioWaveform waveformData={waveformData} currentTime={audioCurrentTime} duration={audioDuration} />
+                                    <AudioWaveform waveformData={waveformData} currentTime={localAudioCurrentTime} duration={audioDuration} />
                                 ) : null}
                                 <AudioProgressBar />
                             </div>

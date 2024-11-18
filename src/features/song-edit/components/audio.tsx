@@ -11,7 +11,7 @@ export const Audio = () => {
     const startTimestampRef = useRef<number | null>(null) // Tracks when playback started
     const elapsedTimeRef = useRef<number>(0); // Tracks total elapsed time on pause
 
-    const setAudioCurrentTime = useSetAtom(audioCurrentTimeAtom)
+    const [audioCurrentTime, setAudioCurrentTime] = useAtom(audioCurrentTimeAtom)
     const setAudioDuration = useSetAtom(audioDurationAtom)
     const [audioPaused, setAudioPaused] = useAtom(audioPausedAtom)
     const setAudioLoading = useSetAtom(audioLoadingAtom)
@@ -70,6 +70,10 @@ export const Audio = () => {
             playAudioContext()
         }
     }, [audioPaused])
+
+    useEffect(() => {
+        elapsedTimeRef.current = audioCurrentTime
+    }, [audioCurrentTime])
 
     useEffect(() => {
         setAudioCurrentTime(0);

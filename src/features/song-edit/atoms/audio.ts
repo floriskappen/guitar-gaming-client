@@ -1,9 +1,4 @@
-import { atom, PrimitiveAtom } from "jotai"
-import { MutableRefObject } from "react";
-
-export const audioRefAtom = atom<MutableRefObject<HTMLAudioElement | null> | null>(
-    null
-) as PrimitiveAtom<MutableRefObject<HTMLAudioElement | null> | null>;
+import { atom } from "jotai"
 
 export const audioCurrentTimeAtom = atom(0)
 export const audioDurationAtom = atom(0)
